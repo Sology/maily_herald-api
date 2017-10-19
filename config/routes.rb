@@ -8,6 +8,12 @@ MailyHerald::Engine.routes.draw do
           post "unsubscribe/:entity_id" => :unsubscribe
         end
       end
+
+      resources :contexts, only: [] do
+        collection do
+          get ":context_name" => :show
+        end
+      end
     end
   end
 
