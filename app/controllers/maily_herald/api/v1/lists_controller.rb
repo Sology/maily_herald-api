@@ -5,13 +5,13 @@ module MailyHerald
         before_action :load_entity, only: [:subscribe, :unsubscribe]
 
         def subscribe
-          @item.subscribe! @entity
-          render_api({})
+          @subscription = @item.subscribe! @entity
+          render_subscription
         end
 
         def unsubscribe
-          @item.unsubscribe! @entity
-          render_api({})
+          @subscription = @item.unsubscribe! @entity
+          render_subscription
         end
 
         private
@@ -30,6 +30,10 @@ module MailyHerald
 
         def root
           "list"
+        end
+
+        def render_subscription
+          render_api @subscription, root: 'subscription'
         end
       end
     end

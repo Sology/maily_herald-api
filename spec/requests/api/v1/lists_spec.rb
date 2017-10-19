@@ -180,7 +180,16 @@ describe "Lists API" do
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
-        it { expect(response_json).to be_empty }
+        it { expect(response_json).not_to be_empty }
+
+        it { expect(response_json["subscription"]["id"]).to eq(MailyHerald::Subscription.first.id) }
+        it { expect(response_json["subscription"]["entity_id"]).to eq(entity.id) }
+        it { expect(response_json["subscription"]["list_id"]).to eq(list.id) }
+        it { expect(response_json["subscription"]["active"]).to be_truthy }
+        it { expect(response_json["subscription"]["unsubscribe_url"]).not_to be_nil }
+        it { expect(response_json["subscription"]["settings"]).to be_kind_of(Hash) }
+        it { expect(response_json["subscription"]["data"]).to be_kind_of(Hash) }
+
         it { expect(list.subscriptions.count).to eq(1) }
         it { expect(list.subscriptions.first).to be_kind_of(MailyHerald::Subscription) }
         it { expect(list.subscriptions.first.entity).to eq(entity) }
@@ -203,7 +212,16 @@ describe "Lists API" do
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
-        it { expect(response_json).to be_empty }
+        it { expect(response_json).not_to be_empty }
+
+        it { expect(response_json["subscription"]["id"]).to eq(MailyHerald::Subscription.first.id) }
+        it { expect(response_json["subscription"]["entity_id"]).to eq(entity.id) }
+        it { expect(response_json["subscription"]["list_id"]).to eq(list.id) }
+        it { expect(response_json["subscription"]["active"]).to be_truthy }
+        it { expect(response_json["subscription"]["unsubscribe_url"]).not_to be_nil }
+        it { expect(response_json["subscription"]["settings"]).to be_kind_of(Hash) }
+        it { expect(response_json["subscription"]["data"]).to be_kind_of(Hash) }
+
         it { expect(MailyHerald::Subscription.count).to eq(1) }
         it { expect(list.subscriptions.count).to eq(1) }
         it { expect(list.subscriptions.first).to be_kind_of(MailyHerald::Subscription) }
@@ -260,7 +278,16 @@ describe "Lists API" do
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
-        it { expect(response_json).to be_empty }
+        it { expect(response_json).not_to be_empty }
+
+        it { expect(response_json["subscription"]["id"]).to eq(MailyHerald::Subscription.first.id) }
+        it { expect(response_json["subscription"]["entity_id"]).to eq(entity.id) }
+        it { expect(response_json["subscription"]["list_id"]).to eq(list.id) }
+        it { expect(response_json["subscription"]["active"]).to be_falsy }
+        it { expect(response_json["subscription"]["unsubscribe_url"]).not_to be_nil }
+        it { expect(response_json["subscription"]["settings"]).to be_kind_of(Hash) }
+        it { expect(response_json["subscription"]["data"]).to be_kind_of(Hash) }
+
         it { expect(list.subscriptions.count).to eq(1) }
         it { expect(list.subscriptions.first.entity).to eq(entity) }
         it { expect(list.subscriptions.first.active).to be_falsy }
@@ -278,7 +305,16 @@ describe "Lists API" do
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
-        it { expect(response_json).to be_empty }
+        it { expect(response_json).not_to be_empty }
+
+        it { expect(response_json["subscription"]["id"]).to eq(MailyHerald::Subscription.first.id) }
+        it { expect(response_json["subscription"]["entity_id"]).to eq(entity.id) }
+        it { expect(response_json["subscription"]["list_id"]).to eq(list.id) }
+        it { expect(response_json["subscription"]["active"]).to be_falsy }
+        it { expect(response_json["subscription"]["unsubscribe_url"]).not_to be_nil }
+        it { expect(response_json["subscription"]["settings"]).to be_kind_of(Hash) }
+        it { expect(response_json["subscription"]["data"]).to be_kind_of(Hash) }
+
         it { expect(list.subscriptions.count).to eq(1) }
         it { expect(list.subscriptions.first.entity).to eq(entity) }
         it { expect(list.subscriptions.first.active).to be_falsy }
