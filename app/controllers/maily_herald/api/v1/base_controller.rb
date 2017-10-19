@@ -24,7 +24,7 @@ module MailyHerald
           def meta
             {
               page: page,
-              next_page: !!collection.next_page,
+              nextPage: !!collection.next_page,
             }
           end
 
