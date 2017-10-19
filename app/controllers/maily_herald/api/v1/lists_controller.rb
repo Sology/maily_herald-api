@@ -3,6 +3,12 @@ module MailyHerald
     module V1
       class ListsController < ResourcesController
 
+        def subscribe
+          @entity = @item.context.model.find params[:entity_id]
+          @item.subscribe! @entity
+          render_api({})
+        end
+
         private
 
         def set_resource
