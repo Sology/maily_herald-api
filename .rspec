@@ -1,0 +1,6 @@
+--require spec_helper
+--color
+#--format=documentation
+--backtrace
+--profile
+--order random
