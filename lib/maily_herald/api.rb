@@ -1,5 +1,6 @@
 require 'maily_herald/api/version'
 require 'active_model_serializers'
+require 'kaminari'
 
 if defined?(::Rails::Engine)
   require "maily_herald/api/engine"

@@ -7,6 +7,52 @@ describe "Lists API" do
     it { expect(MailyHerald::List.count).to eq(2) } # From maily_herald's initializer
   end
 
+  describe "GET #index", focus: true do
+    context "without any params" do
+      before { send_request :get, "/maily_herald/api/v1/lists/" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["lists"].count).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["next_page"]).to be_falsy }
+    end
+
+    context "with defined per param" do
+      before { send_request :get, "/maily_herald/api/v1/lists/", {per: 1} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["lists"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["next_page"]).to be_truthy }
+    end
+
+    context "with defined per and page param" do
+      before { send_request :get, "/maily_herald/api/v1/lists/", {per: 1, page: 2} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["lists"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["next_page"]).to be_falsy }
+    end
+
+    context "with too high page param" do
+      before { send_request :get, "/maily_herald/api/v1/lists/", {per: 1, page: 10} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["lists"].count).to eq(0) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
+      it { expect(response_json["meta"]["pagination"]["next_page"]).to be_falsy }
+    end
+  end
+
   describe "GET #show" do
     let(:list) { MailyHerald.list :generic_list }
 

@@ -29,7 +29,7 @@ module MailyHerald
         end
 
         def root
-          "list"
+          @items ? "lists": "list"
         end
 
         def render_subscription

@@ -2,15 +2,20 @@ module MailyHerald
   module Api
     module V1
       class ResourcesController < BaseController
-        before_action :load_resource, except: :create
+        before_action :load_resource,   except:  [:index, :create]
+        before_action :load_resources,  only:    :index
 
-        def show
-          render_api @item, root: root
+        def index
+          render_api @items, paginate: true, root: root
         end
 
         def create
           @item = resource.new
           assign_attributes_and_render_response
+        end
+
+        def show
+          render_api @item, root: root
         end
 
         def update
@@ -27,6 +32,10 @@ module MailyHerald
 
         def load_resource
           @item = resource.find params[:id]
+        end
+
+        def load_resources
+          @items = resource.all
         end
 
         def assign_attributes_and_render_response
