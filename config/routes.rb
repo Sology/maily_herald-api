@@ -5,6 +5,7 @@ MailyHerald::Engine.routes.draw do
       resources :lists, only: [:show, :create, :update] do
         member do
           post "subscribe/:entity_id" => :subscribe
+          post "unsubscribe/:entity_id" => :unsubscribe
         end
       end
     end

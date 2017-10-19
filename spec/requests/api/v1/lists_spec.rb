@@ -213,4 +213,77 @@ describe "Lists API" do
     end
   end
 
+  describe "POST #unsubscribe" do
+    let!(:list)   { create :list }
+    let!(:entity) { create :user }
+
+    before { list.subscribe! entity }
+
+    context "setup" do
+      it { expect(User.count).to eq(1) }
+      it { expect(MailyHerald::Subscription.count).to eq(1) }
+      it { expect(list.subscriptions.count).to eq(1) }
+      it { expect(list.subscriptions.first.entity).to eq(entity) }
+      it { expect(list.subscriptions.first.active).to be_truthy }
+    end
+
+    context "with invalid params" do
+      context "wrong list ID" do
+        before { send_request :post, "/maily_herald/api/v1/lists/0/unsubscribe/#{entity.id}" }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+        it { list.reload; expect(list.subscriptions.count).to eq(1) }
+        it { expect(list.subscriptions.first.active).to be_truthy }
+      end
+
+      context "wrong entity ID" do
+        before { send_request :post, "/maily_herald/api/v1/lists/#{list.id}/unsubscribe/0" }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+        it { list.reload; expect(list.subscriptions.count).to eq(1) }
+        it { expect(list.subscriptions.first.active).to be_truthy }
+      end
+    end
+
+    context "with valid params" do
+      context "when user's subscription is active" do
+        before do
+          send_request :post, "/maily_herald/api/v1/lists/#{list.id}/unsubscribe/#{entity.id}"
+          list.reload
+        end
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).to be_empty }
+        it { expect(list.subscriptions.count).to eq(1) }
+        it { expect(list.subscriptions.first.entity).to eq(entity) }
+        it { expect(list.subscriptions.first.active).to be_falsy }
+      end
+
+      context "when user's subscription is not active" do
+        before do
+          list.unsubscribe! entity
+          expect(MailyHerald::Subscription.count).to eq(1)
+          expect(list.subscriptions.first.active).to be_falsy
+
+          send_request :post, "/maily_herald/api/v1/lists/#{list.id}/unsubscribe/#{entity.id}"
+          list.reload
+        end
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).to be_empty }
+        it { expect(list.subscriptions.count).to eq(1) }
+        it { expect(list.subscriptions.first.entity).to eq(entity) }
+        it { expect(list.subscriptions.first.active).to be_falsy }
+      end
+    end
+  end
+
 end
