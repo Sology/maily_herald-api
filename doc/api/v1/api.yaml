@@ -1,0 +1,449 @@
+swagger: '2.0'
+info:
+  title: Maily Herald API
+  description: Access Maily Herald data via API.
+  version: 1.0.0
+host: mailyherald.org
+schemes:
+  - http
+basePath: /maily_herald/api/v1
+produces:
+  - application/json
+paths:
+  /lists:
+    get:
+      operationId: get_lists
+      description: Get all lists.
+      summary: Get all lists.
+      tags:
+        - lists
+      parameters:
+        - name: lists
+          in: body
+          description: >-
+            'Per' and 'page' param allowed.
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of lists returned per page
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              lists:
+                type: array
+                description: Collection of serialized MailyHerald::List objects
+                items:
+                  $ref: '#/definitions/List'
+    post:
+      operationId: create_new_list
+      description: Create new list.
+      summary: Create new list.
+      tags:
+        - lists
+      parameters:
+        - name: lists
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              list:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: >-
+                      List's new title.
+                      Name will defined from this attribute e.g.:
+                        - 'New List Title' will have name 'new_list_title'
+                        - 'NewListTitle' will have name 'newlisttitle'
+                  context_name:
+                    type: string
+                    description: MailyHerald::Context name, which was previously created (in the initializer).
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              list:
+                $ref: '#/definitions/List'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  context_name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+  '/lists/{id}':
+    get:
+      operationId: get_list
+      description: Get list.
+      summary: Get list.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a list.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              list:
+                $ref: '#/definitions/List'
+        '404':
+          description: List not found.
+    put:
+      operationId: update_list
+      description: Update list.
+      summary: Update list.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a list.
+          required: true
+          type: integer
+          format: int64
+        - name: lists
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              list:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: List's new title. Name will remain unchanged.
+                  context_name:
+                    type: string
+                    description: MailyHerald::Context name, which was previously created (in the initializer).
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              list:
+                $ref: '#/definitions/List'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      description: Cannot update locked list.
+                      enum:
+                        - locked
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  context_name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+  '/lists/{list_id}/subscriptions':
+    get:
+      operationId: get_list_subscriptions
+      description: Get list subscriptions.
+      summary: Get list subscriptions.
+      tags:
+        - subscriptions
+      parameters:
+        - name: list_id
+          in: path
+          description: ID of a list.
+          required: true
+          type: integer
+          format: int64
+        - name: subscriptions
+          in: body
+          description: >-
+            'kind' param allowed - specify 'active' if you want the list of active subscriptions only. Otherwise, you will get the list of all subscriptions.
+          schema:
+            type: object
+            properties:
+              kind:
+                type: string
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of lists returned per page
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              subscriptions:
+                type: array
+                description: Collection of serialized MailyHerald::Subscription objects
+                items:
+                  $ref: '#/definitions/Subscription'
+        '404':
+          description: List not found.
+  '/lists/{id}/subscribe/{entity_id}':
+    post:
+      operationId: subscribe_entity_to_list
+      description: Subscribe an entity to a list.
+      summary: Subscribe an entity to a list.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a list.
+          required: true
+          type: integer
+          format: int64
+        - name: entity_id
+          in: path
+          description: ID of an entity (e.g. User).
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              subscription:
+                $ref: '#/definitions/Subscription'
+        '404':
+          description: List or entity not found.
+  '/lists/{id}/unsubscribe/{entity_id}':
+    post:
+      operationId: unsubscribe_entity_to_list
+      description: Unsubscribe an entity to a list.
+      summary: Unsubscribe an entity to a list.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a list.
+          required: true
+          type: integer
+          format: int64
+        - name: entity_id
+          in: path
+          description: ID of an entity (e.g. User).
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              subscription:
+                $ref: '#/definitions/Subscription'
+        '404':
+          description: List or entity not found.
+  /contexts:
+    get:
+      operationId: get_contexts
+      description: Get all contexts.
+      summary: Get all contexts.
+      tags:
+        - contexts
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              contexts:
+                type: array
+                description: Collection of serialized MailyHerald::Context objects
+                items:
+                  $ref: '#/definitions/Context'
+  '/contexts/{context_name}':
+    get:
+      operationId: get_context
+      description: Get context.
+      summary: Get context.
+      tags:
+        - contexts
+      parameters:
+        - name: context_name
+          in: path
+          description: ID of a context.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              context:
+                $ref: '#/definitions/Context'
+        '404':
+          description: Context not found.
+definitions:
+  List:
+    type: object
+    description: Serialized MailyHerald::List object
+    properties:
+      id:
+        type: integer
+        description: List's ID
+      name:
+        type: string
+        description: List's name based on title
+      title:
+        type: string
+        description: List's title
+      contextName:
+        type: string
+        description: List's context_name
+      locked:
+        type: boolean
+        description: Indicates whether list is locked or not.
+      subscribersCount:
+        type: integer
+        description: Number of List subscribers.
+      optOutsCount:
+        type: integer
+        description: Number of inactive List subscriptions.
+      potentialSubscribersCount:
+        type: integer
+        description: Number of potential List subscribers.
+    required:
+      - title
+      - contextName
+  Subscription:
+    type: object
+    description: Serialized MailyHerald::Subscription object
+    properties:
+      id:
+        type: integer
+        description: Subscription's ID
+      entityId:
+        type: integer
+        description: Subscription's entity ID
+      listId:
+        type: integer
+        description: Subscription's list ID
+      active:
+        type: boolean
+        description: Indicates whether subscription is active or not.
+      unsubscribeUrl:
+        type: string
+        description: Unsubscribe url.
+      settings:
+        type: object
+        description: Various settings.
+      data:
+        type: object
+        description: Various data.
+    required:
+      - entityId
+      - listId
+  Context:
+    type: object
+    description: Serialized MailyHerald::Context object
+    properties:
+      name:
+        type: string
+        description: Context's name.
+      title:
+        type: string
+        description: Context's title.
+      modelName:
+        type: string
+        description: Context's model name e.g. User.
+      attributes:
+        type: array
+        description: Context's model attributes' keys.
+        items:
+          $ref: '#/definitions/ContextAttribute'
+  ContextAttribute:
+    type: object
+    description: >-
+      Contain key name and subkeys (if specified) of attributes, e.g.:
+        [
+          {"key"=>"name"},
+          {"key"=>"email"},
+          {"key"=>"created_at"},
+          {"key"=>"weekly_notifications"},
+          {
+            "key"=>"properties",
+            "subkeys"=>[{"key"=>"prop1"}, {"key"=>"prop2"}]
+          }
+        ]
+    properties:
+      key:
+        type: string
+      subkeys:
+        type: array
+        description: Context's model attributes' keys.
+        items:
+          $ref: '#/definitions/ContextAttribute'
+  Meta:
+    type: object
+    description: Meta object.
+    properties:
+      pagination:
+        $ref: '#/definitions/Pagination'
+  Pagination:
+    type: object
+    description: Pagination object.
+    properties:
+      page:
+        type: integer
+        description: Current page of searched collection
+      nextPage:
+        type: integer
+        description: Next page of searched collection (if null or false then it's the last page)
