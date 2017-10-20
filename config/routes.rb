@@ -9,7 +9,7 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :contexts, only: [] do
+      resources :contexts, only: :index do
         collection do
           get ":context_name" => :show
         end
