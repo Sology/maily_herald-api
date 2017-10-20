@@ -25,8 +25,14 @@ module MailyHerald
 
         def get_attr_keys h
           h.each_with_object([]) do |(k,v), attrs|
-            attrs << k
-            attrs.concat(get_attr_keys(v)) if v.is_a? Hash
+            if v.is_a? Hash
+              attrs << {
+                key: k,
+                subkeys: get_attr_keys(v)
+              }
+            else
+              attrs << {key: k}
+            end
           end
         end
 
