@@ -16,6 +16,8 @@ MailyHerald::Engine.routes.draw do
           get ":context_name" => :show
         end
       end
+
+      resources :ad_hoc_mailings, only: :create
     end
   end
 

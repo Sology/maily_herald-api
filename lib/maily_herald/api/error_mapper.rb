@@ -13,10 +13,18 @@ module MailyHerald
       # Get hash of mapped errors of object.
       def errors
         object.errors.details.inject({}) do |hash, e|
-          attribute = e[0]
+          attribute = e[0].to_s.camelize(:lower)
           error_type = e[1].first[:error]
 
-          hash[attribute] = error_type.match(/locked/) ? "locked" : error_type
+          hash[attribute] = if error_type.match(/locked/)
+                              "locked"
+                            elsif error_type.match(/Liquid\ syntax\ error/)
+                              "syntaxError"
+                            elsif error_type.match(/is\ not\ a\ boolean\ value/)
+                              "notBoolean"
+                            else
+                              error_type
+                            end
           hash
         end
       end
