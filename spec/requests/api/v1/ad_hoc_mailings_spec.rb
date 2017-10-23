@@ -138,4 +138,73 @@ describe "AdHocMailings API" do
     end
   end
 
+  describe "PUT #update" do
+    let!(:mailing) { create :ad_hoc_mailing }
+
+    it { expect(MailyHerald::AdHocMailing.count).to eq(1) }
+
+    context "with incorrect AdHocMailing ID" do
+      before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/0", {ad_hoc_mailing: {subject: "New Subject", template: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct AdHocMailing ID" do
+      context "with correct params" do
+        before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {subject: "New Subject", template: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["adHocMailing"]["subject"]).to eq("New Subject") }
+        it { expect(response_json["adHocMailing"]["template"]).to eq("New Template") }
+        it { expect(response_json["adHocMailing"]["state"]).to eq("enabled") }
+        it { expect(response_json["adHocMailing"]["mailerName"]).to eq("generic") }
+        it { expect(response_json["adHocMailing"]["conditions"]).to eq("active") }
+      end
+
+      context "with incorrect params" do
+        context "blanks" do
+          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {title: "", list: ""}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["title"]).to eq("blank") }
+          it { expect(response_json["errors"]["list"]).to eq("blank") }
+        end
+
+        context "wrong template" do
+          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {template: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+        end
+
+        context "wrong conditions" do
+          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {conditions: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["conditions"]).to eq("notBoolean") }
+        end
+
+        context "wrong mailer" do
+          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {mailer_name: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["mailerName"]).to eq("invalid") }
+        end
+      end
+    end
+  end
+
 end
