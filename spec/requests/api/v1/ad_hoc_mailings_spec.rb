@@ -4,6 +4,44 @@ describe "AdHocMailings API" do
 
   let(:list) { MailyHerald.list :generic_list }
 
+  describe "GET #show" do
+    let!(:mailing) { create :ad_hoc_mailing }
+
+    it { expect(MailyHerald::AdHocMailing.count).to eq(1) }
+
+    context "with incorrect AdHocMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct AdHocMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["adHocMailing"]).to eq(
+            {
+              "id"=>mailing.id,
+              "listId"=>list.id,
+              "name"=>"ad_hoc_mail",
+              "title"=>"Ad hoc mailing",
+              "subject"=>"Hello!",
+              "template"=>"hello",
+              "conditions"=>nil,
+              "from"=>nil,
+              "state"=>"enabled",
+              "mailerName"=>"AdHocMailer"
+           }
+         )
+        }
+    end
+  end
+
   describe "POST #create" do
     it { expect(MailyHerald::AdHocMailing.count).to eq(0) }
 

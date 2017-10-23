@@ -17,7 +17,7 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :ad_hoc_mailings, only: :create
+      resources :ad_hoc_mailings, only: [:create, :show]
     end
   end
 

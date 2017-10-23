@@ -455,6 +455,29 @@ paths:
                       type: string
                       enum:
                         - invalid
+  '/ad_hoc_mailings/{id}':
+    get:
+      operationId: get_ad_hoc_mailing
+      description: Get ad hoc mailing.
+      summary: Get ad hoc mailing.
+      tags:
+        - adHocMailings
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::AdHocMailing.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              adHocMailing:
+                $ref: '#/definitions/AdHocMailing'
+        '404':
+          description: MailyHerald::AdHocMailing not found.
 definitions:
   List:
     type: object
