@@ -6,6 +6,7 @@ module MailyHerald
         before_action :load_resources,  only:    :index
 
         def index
+          @items = @items.search_by(params[:query]) if @items.respond_to?(:search_by) && params[:query].present?
           render_api @items, paginate: true, root: root
         end
 

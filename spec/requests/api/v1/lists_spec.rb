@@ -51,6 +51,34 @@ describe "Lists API" do
       it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
       it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
     end
+
+    context "with defined query param" do
+      before { send_request :get, "/maily_herald/api/v1/lists/", {query: query} }
+
+      context "when query is 'gen'" do
+        let(:query) { "gen" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["lists"].count).to eq(1) }
+        it { expect(response_json["lists"].first["name"]).to eq("generic_list") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "when query is 'ked'" do
+        let(:query) { "ked" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["lists"].count).to eq(1) }
+        it { expect(response_json["lists"].first["name"]).to eq("locked_list") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+    end
   end
 
   describe "GET #show" do

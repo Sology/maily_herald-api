@@ -34,6 +34,9 @@ paths:
                 type: integer
                 default: 10
                 description: Number of lists returned per page
+              query:
+                type: string
+                description: Filters lists by name or title.
       responses:
         '200':
           description: Operation successful
