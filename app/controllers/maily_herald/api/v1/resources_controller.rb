@@ -7,6 +7,11 @@ module MailyHerald
 
         def index
           @items = @items.search_by(params[:query]) if @items.respond_to?(:search_by) && params[:query].present?
+
+          if block_given?
+            @items = yield(@items)
+          end
+
           render_api @items, paginate: true, root: root
         end
 

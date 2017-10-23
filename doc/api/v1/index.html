@@ -132,6 +132,11 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td><a href="#operation--ad_hoc_mailings-get">GET /ad_hoc_mailings</a></td>
+                        <td><p>Get all ad hoc mailings.</p>
+        </td>
+                    </tr>
+                    <tr>
                         <td><a href="#operation--ad_hoc_mailings-post">POST /ad_hoc_mailings</a></td>
                         <td><p>Create new ad hoc mailing.</p>
         </td>
@@ -161,6 +166,176 @@
     
         
         <span id="path--ad_hoc_mailings"></span>
+            <div id="operation--ad_hoc_mailings-get" class="swagger--panel-operation-get panel">
+                <div class="panel-heading">
+                    <div class="operation-summary">Get all ad hoc mailings.</div>
+                    <h3 class="panel-title"><span class="operation-name">GET</span> <strong>/ad_hoc_mailings</strong></h3>
+                        Tags:
+                            <a href="#tag-adHocMailings">adHocMailings</a>
+                </div>
+                <div class="panel-body">
+                    <section class="sw-operation-description">
+                        <p>Get all ad hoc mailings.</p>
+            
+                    </section>
+            
+                        
+                            <section class="sw-request-body">
+                                
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><p>&#39;Per&#39;, &#39;page&#39;, &#39;query&#39; and &#39;state&#39; param allowed.</p>
+                        </p>
+                                            </div>
+                                            <div class="col-md-6 sw-request-model">
+                            <div  class="panel panel-definition">
+                                <div class="panel-body">
+                                        
+                                                <section class="json-schema-properties">
+                                                    <dl>
+                                                            <dt data-property-name="page">
+                                                                <span class="json-property-name">page:</span>
+                                                                
+                                                                <span class="json-property-type">integer</span>
+                                                                <span class="json-property-range" title="Value limits"></span>
+                                                                
+                                                                        <span class="json-property-default-value">1</span>
+                                                            </dt>
+                                                            <dd>
+                                                                <p>Page number</p>
+                                                
+                                                                <div class="json-inner-schema">
+                                                                    
+                                                                </div>
+                                                            </dd>
+                                                            <dt data-property-name="per">
+                                                                <span class="json-property-name">per:</span>
+                                                                
+                                                                <span class="json-property-type">integer</span>
+                                                                <span class="json-property-range" title="Value limits"></span>
+                                                                
+                                                                        <span class="json-property-default-value">10</span>
+                                                            </dt>
+                                                            <dd>
+                                                                <p>Number of ad hoc mailings returned per page</p>
+                                                
+                                                                <div class="json-inner-schema">
+                                                                    
+                                                                </div>
+                                                            </dd>
+                                                            <dt data-property-name="query">
+                                                                <span class="json-property-name">query:</span>
+                                                                
+                                                                <span class="json-property-type">string</span>
+                                                                <span class="json-property-range" title="Value limits"></span>
+                                                                
+                                                            </dt>
+                                                            <dd>
+                                                                <p>Filters ad hoc mailings by name or title.</p>
+                                                
+                                                                <div class="json-inner-schema">
+                                                                    
+                                                                </div>
+                                                            </dd>
+                                                            <dt data-property-name="state">
+                                                                <span class="json-property-name">state:</span>
+                                                                
+                                                                <span class="json-property-type">string</span>
+                                                                <span class="json-property-range" title="Value limits"></span>
+                                                                
+                                                            </dt>
+                                                            <dd>
+                                                                <p>When not specified all objects are return regardless their state. Allowed states:</p>
+                                                <ul>
+                                                <li>enabled</li>
+                                                <li>disabled</li>
+                                                <li>archived</li>
+                                                <li>not_archived</li>
+                                                </ul>
+                                                
+                                                                <div class="json-inner-schema">
+                                                                    
+                                                                </div>
+                                                            </dd>
+                                                    </dl>
+                                                </section>
+                                </div>
+                            </div></div>
+                                        </div>
+                            </section>        
+                    
+                        <section class="sw-responses">
+                                <p><a href="#sw-default-produces">Uses default content-types: </a>
+                                    <span class="label label-default">application/json</span> 
+                                </p>
+                            
+                            <dl>
+                                    <dt class="sw-response-200">
+                                        200 OK
+                                    
+                                    </dt>
+                                    <dd class="sw-response-200">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <p>Operation successful</p>
+                                            
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                
+                                                <div class="col-md-6 sw-response-model">
+                                                <div  class="panel panel-definition">
+                                                    <div class="panel-body">
+                                                            
+                                                                <section class="json-schema-properties">
+                                                                    <dl>
+                                                                            <dt data-property-name="meta">
+                                                                                <span class="json-property-name">meta:</span>
+                                                                                
+                                                                                <span class="json-property-type">    <a class="json-schema-ref" href="#/definitions/Meta">Meta</a>
+                                                                                </span>
+                                                                                <span class="json-property-range" title="Value limits"></span>
+                                                                                
+                                                                            </dt>
+                                                                            <dd>
+                                                                                
+                                                                                <div class="json-inner-schema">
+                                                                                    
+                                                                                </div>
+                                                                            </dd>
+                                                                            <dt data-property-name="adHocMailings">
+                                                                                <span class="json-property-name">adHocMailings:</span>
+                                                                                
+                                                                                <span class="json-property-type">object[]</span>
+                                                                                <span class="json-property-range" title="Value limits"></span>
+                                                                                
+                                                                            </dt>
+                                                                            <dd>
+                                                                                <p>Collection of serialized MailyHerald::AdHocMailing objects</p>
+                                                                
+                                                                                <div class="json-inner-schema">
+                                                                                    
+                                                                                                    <section class="json-schema-array-items">
+                                                                                                        
+                                                                                                        <span class="json-property-type">    <a class="json-schema-ref" href="#/definitions/AdHocMailing">AdHocMailing</a>
+                                                                                                        </span>
+                                                                                                        <span class="json-property-range" title="Value limits"></span>
+                                                                                                        
+                                                                                                        <div class="json-inner-schema">
+                                                                                                            
+                                                                                                        </div>
+                                                                                                    </section>                </div>
+                                                                            </dd>
+                                                                    </dl>
+                                                                </section>
+                                                    </div>
+                                                </div></div>
+                                            
+                                            </div>                </dd>
+                            </dl>
+                        </section>
+                </div>
+            </div>
             <div id="operation--ad_hoc_mailings-post" class="swagger--panel-operation-post panel">
                 <div class="panel-heading">
                     <div class="operation-summary">Create new ad hoc mailing.</div>
@@ -1411,7 +1586,7 @@
                                 
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <p><p>&#39;Per&#39; and &#39;page&#39; param allowed.</p>
+                                                <p><p>&#39;Per&#39;, &#39;page&#39; and &#39;query&#39; param allowed.</p>
                         </p>
                                             </div>
                                             <div class="col-md-6 sw-request-model">

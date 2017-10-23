@@ -21,7 +21,7 @@ paths:
         - name: lists
           in: body
           description: >-
-            'Per' and 'page' param allowed.
+            'Per', 'page' and 'query' param allowed.
           required: true
           schema:
             type: object
@@ -353,6 +353,52 @@ paths:
         '404':
           description: Context not found.
   /ad_hoc_mailings:
+    get:
+      operationId: get_ad_hoc_mailings
+      description: Get all ad hoc mailings.
+      summary: Get all ad hoc mailings.
+      tags:
+        - adHocMailings
+      parameters:
+        - name: ad_hoc_mailing
+          in: body
+          description: >-
+            'Per', 'page', 'query' and 'state' param allowed.
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of ad hoc mailings returned per page
+              query:
+                type: string
+                description: Filters ad hoc mailings by name or title.
+              state:
+                type: string
+                description: >-
+                  When not specified all objects are return regardless their state. Allowed states:
+                    - enabled
+                    - disabled
+                    - archived
+                    - not_archived
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              adHocMailings:
+                type: array
+                description: Collection of serialized MailyHerald::AdHocMailing objects
+                items:
+                  $ref: '#/definitions/AdHocMailing'
     post:
       operationId: create_new_ad_hoc_mailing
       description: Create new ad hoc mailing.

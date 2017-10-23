@@ -15,8 +15,7 @@ module MailyHerald
 
         def root
           root = mailing_class_name.camelize(:lower)
-          root.pluralize if @items
-          root
+          @items ? root.pluralize : root
         end
 
         def mailing_class_name

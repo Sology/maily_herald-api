@@ -4,6 +4,164 @@ describe "AdHocMailings API" do
 
   let(:list) { MailyHerald.list :generic_list }
 
+  describe "GET #index" do
+    let!(:ad_hoc_mailing1) { create :ad_hoc_mailing }
+    let!(:ad_hoc_mailing2) { create :ad_hoc_mailing, name: "test", title: "test" }
+
+    context "without any params" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["adHocMailings"].count).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined per param" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {per: 1} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["adHocMailings"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_truthy }
+    end
+
+    context "with defined per and page param" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {per: 1, page: 2} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["adHocMailings"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with too high page param" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {per: 1, page: 10} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["adHocMailings"].count).to eq(0) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined query param" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {query: query} }
+
+      context "when query is 'gen'" do
+        let(:query) { "test" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["adHocMailings"].count).to eq(1) }
+        it { expect(response_json["adHocMailings"].first["name"]).to eq("test") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "when query is 'ked'" do
+        let(:query) { "ad" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["adHocMailings"].count).to eq(1) }
+        it { expect(response_json["adHocMailings"].first["name"]).to eq("ad_hoc_mail") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+    end
+
+    context "with 'state' param" do
+      context "when 'enabled' or 'disabled'" do
+        before do
+          ad_hoc_mailing1.disable!
+          ad_hoc_mailing1.reload
+          expect(MailyHerald::AdHocMailing.enabled.count).to eq(1)
+        end
+
+        context "should return enabled mailings" do
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :enabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["adHocMailings"].count).to eq(1) }
+          it { expect(response_json["adHocMailings"].first["state"]).to eq("enabled") }
+          it { expect(response_json["adHocMailings"].first["name"]).to eq(ad_hoc_mailing2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return disabled mailings'" do
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :disabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["adHocMailings"].count).to eq(1) }
+          it { expect(response_json["adHocMailings"].first["state"]).to eq("disabled") }
+          it { expect(response_json["adHocMailings"].first["name"]).to eq(ad_hoc_mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+
+      context "when 'archived' or 'not_archived'" do
+        before do
+          ad_hoc_mailing1.archive!
+          ad_hoc_mailing1.reload
+          expect(MailyHerald::AdHocMailing.archived.count).to eq(1)
+        end
+
+        context "should return archived mailings" do
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["adHocMailings"].count).to eq(1) }
+          it { expect(response_json["adHocMailings"].first["state"]).to eq("archived") }
+          it { expect(response_json["adHocMailings"].first["name"]).to eq(ad_hoc_mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return enabled and disabled mailings" do
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :not_archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["adHocMailings"].count).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+    end
+
+    context "'query' and 'state' combined" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :enabled, query: "test"} }
+
+      it { expect(MailyHerald::AdHocMailing.enabled.count).to eq(2) }
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["adHocMailings"].count).to eq(1) }
+      it { expect(response_json["adHocMailings"].first["name"]).to eq(ad_hoc_mailing2.name) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+  end
+
   describe "GET #show" do
     let!(:mailing) { create :ad_hoc_mailing }
 
