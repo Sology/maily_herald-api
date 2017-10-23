@@ -191,6 +191,24 @@ paths:
                       type: string
                       enum:
                         - blank
+    delete:
+      operationId: destroy_list
+      description: Destroy list.
+      summary: Destroy list.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a list.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: List not found.
   '/lists/{list_id}/subscriptions':
     get:
       operationId: get_list_subscriptions

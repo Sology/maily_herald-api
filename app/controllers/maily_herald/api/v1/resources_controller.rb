@@ -23,6 +23,14 @@ module MailyHerald
           assign_attributes_and_render_response
         end
 
+        def destroy
+          if @item.destroy
+            render_api({})
+          else
+            render_error @item
+          end
+        end
+
         protected
 
         def resource

@@ -214,6 +214,48 @@ describe "Lists API" do
     end
   end
 
+  describe "DELETE #destroy" do
+    let!(:list) { create :list }
+
+    it { expect(MailyHerald::List.count).to eq(3) }
+
+    context "when list is locked with correct params" do
+      let!(:locked_list) { MailyHerald.list :generic_list }
+
+      before { send_request :delete, "/maily_herald/api/v1/lists/#{locked_list.id}" }
+
+      it { expect(response.status).to eq(422) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["errors"]["base"]).to eq("locked") }
+      it { expect(locked_list.reload).to eq(locked_list) }
+      it { expect(MailyHerald::List.count).to eq(3) }
+    end
+
+    context "when list is not locked" do
+      context "with valid list ID" do
+        before { send_request :delete, "/maily_herald/api/v1/lists/#{list.id}" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).to be_empty }
+        it { expect { list.reload }.to raise_exception(ActiveRecord::RecordNotFound) }
+        it { expect(MailyHerald::List.count).to eq(2) }
+      end
+
+      context "with invalid list ID" do
+        before { send_request :delete, "/maily_herald/api/v1/lists/0" }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+        it { expect(list.reload).to eq(list) }
+        it { expect(MailyHerald::List.count).to eq(3) }
+      end
+    end
+  end
+
   describe "POST #subscribe" do
     let!(:list)   { create :list }
     let!(:entity) { create :user }
