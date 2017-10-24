@@ -821,6 +821,29 @@ paths:
                       enum:
                         - blank
                         - notTime
+  '/one_time_mailings/{id}':
+    get:
+      operationId: get_one_time_mailing
+      description: Get one time mailing.
+      summary: Get one time mailing.
+      tags:
+        - oneTimeMailings
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::OneTimeMailing.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              oneTimeMailing:
+                $ref: '#/definitions/OneTimeMailing'
+        '404':
+          description: MailyHerald::OneTimeMailing not found.
 definitions:
   List:
     type: object

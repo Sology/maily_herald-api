@@ -2,6 +2,46 @@ require "rails_helper"
 
 describe "OneTimeMailings API" do
 
+  describe "GET #show" do
+    let!(:mailing) { MailyHerald.one_time_mailing :locked_mailing }
+    let(:list)     { mailing.list }
+
+    it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
+
+    context "with incorrect OneTimeMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct OneTimeMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["oneTimeMailing"]).to eq(
+            {
+              "id"          =>  mailing.id,
+              "listId"      =>  list.id,
+              "name"        =>  "locked_mailing",
+              "title"       =>  "Locked mailing",
+              "subject"     =>  "Locked mailing",
+              "template"    =>  "User name: {{user.name}}.",
+              "conditions"  =>  nil,
+              "from"        =>  nil,
+              "state"       =>  "enabled",
+              "mailerName"  =>  "generic",
+              "startAt"     =>  "user.created_at"
+           }
+         )
+        }
+    end
+  end
+
   describe "POST #create" do
     let(:list)     { MailyHerald.list :generic_list }
     let(:start_at) { Time.now + 1.minute }
