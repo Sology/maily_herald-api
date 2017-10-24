@@ -979,6 +979,9 @@ definitions:
       state:
         type: string
         description: AdHocMailing's state - can be either enabled, disabled or archived.
+      locked:
+        type: boolean
+        description: Indicates whether mailing is locked or not.
     required:
       - name
       - title
@@ -1020,6 +1023,9 @@ definitions:
       state:
         type: string
         description: OneTimeMailing's state - can be either enabled, disabled or archived.
+      locked:
+        type: boolean
+        description: Indicates whether mailing is locked or not.
       startAt:
         type: string
         description: OneTimeMailing's delivery start time. E.g. 2017-10-24T11:11:55.526+02:00

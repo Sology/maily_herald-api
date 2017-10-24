@@ -35,7 +35,8 @@ describe "OneTimeMailings API" do
               "from"        =>  nil,
               "state"       =>  "enabled",
               "mailerName"  =>  "generic",
-              "startAt"     =>  "user.created_at"
+              "startAt"     =>  "user.created_at",
+              "locked"      =>  true
            }
          )
         }
@@ -66,6 +67,7 @@ describe "OneTimeMailings API" do
       it { expect(response_json["oneTimeMailing"]["conditions"]).to be_nil }
       it { expect(response_json["oneTimeMailing"]["from"]).to be_nil }
       it { expect(response_json["oneTimeMailing"]["startAt"]).to eq(start_at.as_json) }
+      it { expect(response_json["oneTimeMailing"]["locked"]).to be_falsy }
     end
 
     context "with incorrect params" do

@@ -21,7 +21,8 @@ describe MailyHerald::OneTimeMailingSerializer do
         subject:    one_time_mailing.subject,
         template:   one_time_mailing.template,
         title:      one_time_mailing.title,
-        startAt:    one_time_mailing.start_at.as_json
+        startAt:    one_time_mailing.start_at.as_json,
+        locked:     false
       })
     end
   end

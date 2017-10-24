@@ -184,16 +184,17 @@ describe "AdHocMailings API" do
       it { expect(response_json).not_to be_empty }
       it { expect(response_json["adHocMailing"]).to eq(
             {
-              "id"=>mailing.id,
-              "listId"=>list.id,
-              "name"=>"ad_hoc_mail",
-              "title"=>"Ad hoc mailing",
-              "subject"=>"Hello!",
-              "template"=>"hello",
-              "conditions"=>nil,
-              "from"=>nil,
-              "state"=>"enabled",
-              "mailerName"=>"AdHocMailer"
+              "id"          =>  mailing.id,
+              "listId"      =>  list.id,
+              "name"        =>  "ad_hoc_mail",
+              "title"       =>  "Ad hoc mailing",
+              "subject"     =>  "Hello!",
+              "template"    =>  "hello",
+              "conditions"  =>  nil,
+              "from"        =>  nil,
+              "state"       =>  "enabled",
+              "mailerName"  =>  "AdHocMailer",
+              "locked"      =>  false
            }
          )
         }
@@ -220,6 +221,7 @@ describe "AdHocMailings API" do
       it { expect(response_json["adHocMailing"]["mailerName"]).to eq("generic") }
       it { expect(response_json["adHocMailing"]["conditions"]).to be_nil }
       it { expect(response_json["adHocMailing"]["from"]).to be_nil }
+      it { expect(response_json["adHocMailing"]["locked"]).to be_falsy }
     end
 
     context "with incorrect params" do

@@ -20,7 +20,8 @@ describe MailyHerald::MailingSerializer do
         state:      ad_hoc_mailing.state,
         subject:    ad_hoc_mailing.subject,
         template:   ad_hoc_mailing.template,
-        title:      ad_hoc_mailing.title
+        title:      ad_hoc_mailing.title,
+        locked:     false
       })
     end
   end
