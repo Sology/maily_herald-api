@@ -707,6 +707,118 @@ paths:
           description: Success
         '404':
           description: MailyHerald::AdHocMailing or entity not found.
+  /one_time_mailings:
+    post:
+      operationId: create_new_one_time_mailing
+      description: Create new one time mailing.
+      summary: Create new one time mailing.
+      tags:
+        - oneTimeMailings
+      parameters:
+        - name: one_time_mailing
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              one_time_mailing:
+                type: object
+                properties:
+                  title:
+                    required: true
+                    type: string
+                    description: >-
+                      One time mailing's new title.
+                      Name will defined from this attribute e.g.:
+                        - 'New one time mailing' will have name 'new_one_time_mailing'
+                        - 'NewOneTimeMailing' will have name 'newonetimemailing'
+                  subject:
+                    required: true
+                    type: string
+                    description: One time mailing's subject.
+                  template:
+                    required: true
+                    type: string
+                    description: One time mailing's template. Will be validated against Liquid syntax.
+                  list:
+                    required: true
+                    type: string
+                    description: Previously created MailyHerald::List object's name.
+                  from:
+                    type: string
+                    description: If not specified, default value will be used.
+                  conditions:
+                    type: string
+                    description: After validation has to return boolean value.
+                  mailer_name:
+                    type: string
+                    description: Has to be previously created mailer.
+                  start_at:
+                    type: string
+                    description: Date with time as a string.
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              oneTimeMailing:
+                $ref: '#/definitions/OneTimeMailing'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  subject:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  template:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  list:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  conditions:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - notBoolean
+                  mailerName:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  startAt:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
 definitions:
   List:
     type: object
@@ -841,13 +953,58 @@ definitions:
           AdHocMailing's alternative 'from' attribute.
       state:
         type: string
-        description: AdHocMailing's state - can be either enabled or disabled.
+        description: AdHocMailing's state - can be either enabled, disabled or archived.
     required:
       - name
       - title
       - subject
       - template
       - listId
+  OneTimeMailing:
+    type: object
+    description: Serialized MailyHerald::OneTimeMailing object.
+    properties:
+      id:
+        type: integer
+        description: OneTimeMailing's ID.
+      name:
+        type: string
+        description: OneTimeMailing's name based on title.
+      title:
+        type: string
+        description: OneTimeMailing's title.
+      listId:
+        type: integer
+        description: ID of an associated MailyHerald::List object.
+      subject:
+        type: string
+        description: OneTimeMailing's subject.
+      template:
+        type: string
+        description: OneTimeMailing's template.
+      mailerName:
+        type: string
+        description: OneTimeMailing's mailer's name.
+      conditions:
+        type: string
+        description: OneTimeMailing's conditions.
+      from:
+        type: string
+        description: >-
+          OneTimeMailing's alternative 'from' attribute.
+      state:
+        type: string
+        description: OneTimeMailing's state - can be either enabled, disabled or archived.
+      startAt:
+        type: string
+        description: OneTimeMailing's delivery start time. E.g. 2017-10-24T11:11:55.526+02:00
+    required:
+      - name
+      - title
+      - subject
+      - template
+      - listId
+      - startAt
   MailPreview:
     type: object
     description: Serialized Mail::Message object.

@@ -24,6 +24,8 @@ MailyHerald::Engine.routes.draw do
           post "deliver/:entity_id" => :deliver
         end
       end
+
+      resources :one_time_mailings, only: :create
     end
   end
 
