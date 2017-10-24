@@ -432,16 +432,20 @@ describe "AdHocMailings API" do
       it { expect(response).to be_success }
       it { expect(response_json).not_to be_empty }
       it { expect(response_json["mailPreview"]).to eq({
-             "messageId"=>nil,
-             "date"=>nil,
-             "headers"=>
-              [{"name"=>"From", "value"=>"no-reply@mailyherald.org"},
-               {"name"=>"To", "value"=>entity.email},
-               {"name"=>"Subject", "value"=>"Test"},
-               {"name"=>"Mime-Version", "value"=>"1.0"},
-               {"name"=>"Content-Type", "value"=>"text/plain"}],
-             "body"=>
-              {"charset"=>"US-ASCII", "encoding"=>"7bit", "rawSource"=>"Hello\n\n"}
+             "messageId"  =>  nil,
+             "date"       =>  nil,
+             "headers"    =>  [
+                                {"name"=>"From"         , "value"=>"no-reply@mailyherald.org"},
+                                {"name"=>"To"           , "value"=>entity.email},
+                                {"name"=>"Subject"      , "value"=>"Test"},
+                                {"name"=>"Mime-Version" , "value"=>"1.0"},
+                                {"name"=>"Content-Type" , "value"=>"text/plain"}
+                              ],
+             "body"       => {
+                                "charset"   =>  "US-ASCII",
+                                "encoding"  =>  "7bit",
+                                "rawSource" =>  "Hello\n\n"
+                             }
            })
          }
     end
