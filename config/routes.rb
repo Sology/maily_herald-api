@@ -25,7 +25,7 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :one_time_mailings, only: [:create, :show, :update]
+      resources :one_time_mailings, except: [:index, :new, :edit]
     end
   end
 

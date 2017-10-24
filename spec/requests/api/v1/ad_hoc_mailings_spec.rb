@@ -374,7 +374,7 @@ describe "AdHocMailings API" do
     it { expect(MailyHerald::AdHocMailing.count).to eq(1) }
 
     context "with correct AdHocMailing ID" do
-      before { send_request :delete, "/maily_herald/api/v1/ad_hoc_mailings/#{list.id}" }
+      before { send_request :delete, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}" }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
