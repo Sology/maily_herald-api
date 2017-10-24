@@ -4,7 +4,7 @@ MailyHerald::Engine.routes.draw do
     namespace :v1 do
       resources :lists, except: [:new, :edit] do
         member do
-          post "subscribe/:entity_id" => :subscribe
+          post "subscribe/:entity_id"   => :subscribe
           post "unsubscribe/:entity_id" => :unsubscribe
         end
 
@@ -19,7 +19,9 @@ MailyHerald::Engine.routes.draw do
 
       resources :ad_hoc_mailings, except: [:new, :edit] do
         member do
-          get "preview/:entity_id" => :preview
+          get  "preview/:entity_id" => :preview
+          post :deliver
+          post "deliver/:entity_id" => :deliver
         end
       end
     end

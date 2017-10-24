@@ -444,4 +444,83 @@ describe "AdHocMailings API" do
     end
   end
 
+  describe "POST #deliver" do
+    let!(:mailing) { create :ad_hoc_mailing }
+    let!(:entity1) { create :user }
+    let!(:entity2) { create :user }
+
+    before do
+      mailing.list.subscribe! entity1
+      mailing.list.subscribe! entity2
+      mailing.reload
+    end
+
+    it { expect(MailyHerald::AdHocMailing.count).to eq(1) }
+    it { expect(mailing.list.active_subscription_count).to eq(2) }
+    it { expect(mailing.processable?(entity1)).to be_truthy }
+    it { expect(mailing.processable?(entity2)).to be_truthy }
+    it { expect(mailing.logs.scheduled.count).to eq(0) }
+    it { expect(mailing.logs.processed.count).to eq(0) }
+
+    context "with incorrect AdHocMailing ID" do
+      before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings/0/deliver" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct AdHocMailing ID" do
+      context "with incorrect entity ID" do
+        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}/deliver/0" }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+      end
+
+      context "without entity ID" do
+        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}/deliver" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).to be_empty }
+
+        it { expect(mailing.logs.scheduled.count).to eq(2) }
+        it { expect(mailing.logs.processed.count).to eq(0) }
+        it { expect(mailing.logs.delivered.count).to eq(0) }
+
+        context "after running delivery" do
+          before { mailing.run && mailing.reload }
+
+          it { expect(mailing.logs.processed.count).to eq(2) }
+          it { expect(mailing.logs.delivered.count).to eq(2) }
+        end
+      end
+
+      context "with entity ID" do
+        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}/deliver/#{entity1.id}" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).to be_empty }
+
+        it { expect(mailing.logs.scheduled.count).to eq(1) }
+        it { expect(mailing.logs.processed.count).to eq(0) }
+        it { expect(mailing.logs.delivered.count).to eq(0) }
+        it { expect(mailing.logs.scheduled.first.entity_id).to eq(entity1.id) }
+
+        context "after running delivery" do
+          before { mailing.run && mailing.reload }
+
+          it { expect(mailing.logs.processed.count).to eq(1) }
+          it { expect(mailing.logs.delivered.count).to eq(1) }
+          it { expect(mailing.logs.delivered.first.entity_id).to eq(entity1.id) }
+        end
+      end
+    end
+  end
+
 end

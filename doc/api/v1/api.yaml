@@ -663,6 +663,50 @@ paths:
                 $ref: '#/definitions/MailPreview'
         '404':
           description: MailyHerald::AdHocMailing or entity not found.
+  '/ad_hoc_mailings/{id}/deliver':
+    get:
+      operationId: schedule_ad_hoc_mailing_for_all_entities
+      description: Schedule ad hoc mailing for all enities.
+      summary: Schedule ad hoc mailing for all enities.
+      tags:
+        - schedules
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::AdHocMailing.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: MailyHerald::AdHocMailing not found.
+  '/ad_hoc_mailings/{id}/deliver/{entity_id}':
+    get:
+      operationId: schedule_ad_hoc_mailing_for_entity
+      description: Schedule ad hoc mailing for given entity.
+      summary: Schedule ad hoc mailing for given entity.
+      tags:
+        - schedules
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::AdHocMailing.
+          required: true
+          type: integer
+          format: int64
+        - name: entity_id
+          in: path
+          description: ID of a entity e.g. User.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: MailyHerald::AdHocMailing or entity not found.
 definitions:
   List:
     type: object
