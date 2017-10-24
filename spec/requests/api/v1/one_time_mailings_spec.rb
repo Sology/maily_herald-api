@@ -459,4 +459,60 @@ describe "OneTimeMailings API" do
     end
   end
 
+  describe "GET #preview" do
+    let!(:mailing) { create :generic_one_time_mailing }
+    let!(:entity) { create :user }
+
+    before do
+      mailing.list.subscribe! entity
+      mailing.reload
+    end
+
+    it { expect(MailyHerald::OneTimeMailing.count).to eq(2) }
+    it { expect(mailing.list.active_subscription_count).to eq(1) }
+
+    context "with incorrect OneTimeMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings/0/preview/#{entity.id}" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with incorrect entity ID" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}/preview/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct OneTimeMailing ID and entity ID" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}/preview/#{entity.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["mailPreview"]).to eq({
+             "messageId"  =>  nil,
+             "date"       =>  nil,
+             "headers"    =>  [
+                                {"name"=>"From"          , "value"=>mailing.from},
+                                {"name"=>"To"            , "value"=>entity.email},
+                                {"name"=>"Subject"       , "value"=>mailing.subject},
+                                {"name"=>"Mime-Version"  , "value"=>"1.0"},
+                                {"name"=>"Content-Type"  , "value"=>"text/plain"}
+                              ],
+             "body"       =>  {
+                                "charset"   =>  "US-ASCII",
+                                "encoding"  =>  "7bit",
+                                "rawSource" =>  "User name: #{entity.name}."
+                              }
+           })
+         }
+    end
+  end
+
 end
