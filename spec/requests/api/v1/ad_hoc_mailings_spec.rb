@@ -392,4 +392,56 @@ describe "AdHocMailings API" do
     end
   end
 
+  describe "GET #preview" do
+    let!(:mailing) { create :ad_hoc_mailing }
+    let!(:entity) { create :user }
+
+    before do
+      mailing.list.subscribe! entity
+      mailing.reload
+    end
+
+    it { expect(MailyHerald::AdHocMailing.count).to eq(1) }
+    it { expect(mailing.list.active_subscription_count).to eq(1) }
+
+    context "with incorrect AdHocMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/0/preview/#{entity.id}" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with incorrect entity ID" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}/preview/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct AdHocMailing ID and entity ID" do
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}/preview/#{entity.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["mailPreview"]).to eq({
+             "messageId"=>nil,
+             "date"=>nil,
+             "headers"=>
+              [{"name"=>"From", "value"=>"no-reply@mailyherald.org"},
+               {"name"=>"To", "value"=>entity.email},
+               {"name"=>"Subject", "value"=>"Test"},
+               {"name"=>"Mime-Version", "value"=>"1.0"},
+               {"name"=>"Content-Type", "value"=>"text/plain"}],
+             "body"=>
+              {"charset"=>"US-ASCII", "encoding"=>"7bit", "rawSource"=>"Hello\n\n"}
+           })
+         }
+    end
+  end
+
 end

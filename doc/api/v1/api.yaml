@@ -634,6 +634,35 @@ paths:
                 $ref: '#/definitions/AdHocMailing'
         '404':
           description: MailyHerald::AdHocMailing not found.
+  '/ad_hoc_mailings/{id}/preview/{entity_id}':
+    get:
+      operationId: get_ad_hoc_mailing_preview
+      description: Get ad hoc mailing preview for given entity.
+      summary: Get ad hoc mailing's preview.
+      tags:
+        - mailPreviews
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::AdHocMailing.
+          required: true
+          type: integer
+          format: int64
+        - name: entity_id
+          in: path
+          description: ID of a entity e.g. User.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              mailPreview:
+                $ref: '#/definitions/MailPreview'
+        '404':
+          description: MailyHerald::AdHocMailing or entity not found.
 definitions:
   List:
     type: object
@@ -775,6 +804,44 @@ definitions:
       - subject
       - template
       - listId
+  MailPreview:
+    type: object
+    description: Serialized Mail::Message object.
+    properties:
+      messageId:
+        type: string
+        description: Could be nil - if not sent.
+      date:
+        type: string
+        description: Could be nil - if not sent.
+      headers:
+        type: array
+        description: Array of email headers.
+        items:
+          $ref: '#/definitions/MailHeader'
+      body:
+        type: object
+        description: Serialized Mail::Body object.
+        properties:
+          charset:
+            type: string
+            description: Charset e.g. US-ASCII
+          encoding:
+            type: string
+            description: Encoding e.g. 7bit
+          rawSource:
+            type: string
+            description: Email body.
+  MailHeader:
+    type: object
+    description: Serialized Mail::Header object.
+    properties:
+      name:
+        type: string
+        description: Name of email header.
+      value:
+        type: string
+        description: Value of email header.
   Meta:
     type: object
     description: Meta object.
