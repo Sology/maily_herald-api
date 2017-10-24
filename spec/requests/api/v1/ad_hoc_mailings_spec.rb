@@ -9,7 +9,7 @@ describe "AdHocMailings API" do
     let!(:ad_hoc_mailing2) { create :ad_hoc_mailing, name: "test", title: "test" }
 
     context "without any params" do
-      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/" }
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings" }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -20,7 +20,7 @@ describe "AdHocMailings API" do
     end
 
     context "with defined per param" do
-      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {per: 1} }
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {per: 1} }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -31,7 +31,7 @@ describe "AdHocMailings API" do
     end
 
     context "with defined per and page param" do
-      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {per: 1, page: 2} }
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {per: 1, page: 2} }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -42,7 +42,7 @@ describe "AdHocMailings API" do
     end
 
     context "with too high page param" do
-      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {per: 1, page: 10} }
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {per: 1, page: 10} }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -53,9 +53,9 @@ describe "AdHocMailings API" do
     end
 
     context "with defined query param" do
-      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {query: query} }
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {query: query} }
 
-      context "when query is 'gen'" do
+      context "when query is 'test'" do
         let(:query) { "test" }
 
         it { expect(response.status).to eq(200) }
@@ -67,7 +67,7 @@ describe "AdHocMailings API" do
         it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
       end
 
-      context "when query is 'ked'" do
+      context "when query is 'ad'" do
         let(:query) { "ad" }
 
         it { expect(response.status).to eq(200) }
@@ -89,7 +89,7 @@ describe "AdHocMailings API" do
         end
 
         context "should return enabled mailings" do
-          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :enabled} }
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {state: :enabled} }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -102,7 +102,7 @@ describe "AdHocMailings API" do
         end
 
         context "should return disabled mailings'" do
-          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :disabled} }
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {state: :disabled} }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -123,7 +123,7 @@ describe "AdHocMailings API" do
         end
 
         context "should return archived mailings" do
-          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :archived} }
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {state: :archived} }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -136,7 +136,7 @@ describe "AdHocMailings API" do
         end
 
         context "should return enabled and disabled mailings" do
-          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :not_archived} }
+          before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {state: :not_archived} }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -149,7 +149,7 @@ describe "AdHocMailings API" do
     end
 
     context "'query' and 'state' combined" do
-      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings/", {state: :enabled, query: "test"} }
+      before { send_request :get, "/maily_herald/api/v1/ad_hoc_mailings", {state: :enabled, query: "test"} }
 
       it { expect(MailyHerald::AdHocMailing.enabled.count).to eq(2) }
       it { expect(response.status).to eq(200) }

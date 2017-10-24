@@ -2,6 +2,172 @@ require "rails_helper"
 
 describe "OneTimeMailings API" do
 
+  describe "GET #index" do
+    let!(:mailing1) { create :generic_one_time_mailing }
+    let!(:mailing2) { create :generic_one_time_mailing , name: "second_one", title: "second one"}
+
+    it { expect(MailyHerald::OneTimeMailing.count).to eq(3) }
+
+    context "without any params" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["oneTimeMailings"].count).to eq(3) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined per param" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {per: 1} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_truthy }
+    end
+
+    context "with defined per and page param" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {per: 1, page: 3} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(3) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with too high page param" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {per: 1, page: 10} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["oneTimeMailings"].count).to eq(0) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined query param" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {query: query} }
+
+      context "when query is 'test'" do
+        let(:query) { "test" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+        it { expect(response_json["oneTimeMailings"].first["name"]).to eq("test_mailing") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "when query is 'sec'" do
+        let(:query) { "sec" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+        it { expect(response_json["oneTimeMailings"].first["name"]).to eq("second_one") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+    end
+
+    context "with 'state' param" do
+      context "when 'enabled' or 'disabled'" do
+        before do
+          mailing1.disable!
+          mailing1.reload
+          expect(MailyHerald::OneTimeMailing.enabled.count).to eq(2)
+        end
+
+        context "should return enabled mailings" do
+          before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {state: :enabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["oneTimeMailings"].count).to eq(2) }
+          it { expect(response_json["oneTimeMailings"].first["state"]).to eq("enabled") }
+          it { expect(response_json["oneTimeMailings"].first["name"]).to eq("locked_mailing") }
+          it { expect(response_json["oneTimeMailings"].second["state"]).to eq("enabled") }
+          it { expect(response_json["oneTimeMailings"].second["name"]).to eq(mailing2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return disabled mailings'" do
+          before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {state: :disabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+          it { expect(response_json["oneTimeMailings"].first["state"]).to eq("disabled") }
+          it { expect(response_json["oneTimeMailings"].first["name"]).to eq(mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+
+      context "when 'archived' or 'not_archived'" do
+        before do
+          mailing1.archive!
+          mailing1.reload
+          expect(MailyHerald::OneTimeMailing.archived.count).to eq(1)
+        end
+
+        context "should return archived mailings" do
+          before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {state: :archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+          it { expect(response_json["oneTimeMailings"].first["state"]).to eq("archived") }
+          it { expect(response_json["oneTimeMailings"].first["name"]).to eq(mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return enabled and disabled mailings" do
+          before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {state: :not_archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["oneTimeMailings"].count).to eq(2) }
+          it { expect(response_json["oneTimeMailings"].first["state"]).to eq("enabled") }
+          it { expect(response_json["oneTimeMailings"].first["name"]).to eq("locked_mailing") }
+          it { expect(response_json["oneTimeMailings"].second["state"]).to eq("enabled") }
+          it { expect(response_json["oneTimeMailings"].second["name"]).to eq(mailing2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+    end
+
+    context "'query' and 'state' combined" do
+      before { send_request :get, "/maily_herald/api/v1/one_time_mailings", {state: :enabled, query: "second"} }
+
+      it { expect(MailyHerald::OneTimeMailing.enabled.count).to eq(3) }
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["oneTimeMailings"].count).to eq(1) }
+      it { expect(response_json["oneTimeMailings"].first["name"]).to eq(mailing2.name) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+  end
+
   describe "GET #show" do
     let!(:mailing) { MailyHerald.one_time_mailing :locked_mailing }
     let(:list)     { mailing.list }

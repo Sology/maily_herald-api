@@ -714,6 +714,52 @@ paths:
         '404':
           description: MailyHerald::AdHocMailing or entity not found.
   /one_time_mailings:
+    get:
+      operationId: get_one_time_mailings
+      description: Get all one time mailings.
+      summary: Get all one time mailings.
+      tags:
+        - oneTimeMailings
+      parameters:
+        - name: one_time_mailing
+          in: body
+          description: >-
+            'Per', 'page', 'query' and 'state' param allowed.
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of one time mailings returned per page
+              query:
+                type: string
+                description: Filters one time mailings by name or title.
+              state:
+                type: string
+                description: >-
+                  When not specified all objects are return regardless their state. Allowed states:
+                    - enabled
+                    - disabled
+                    - archived
+                    - not_archived
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              oneTimeMailings:
+                type: array
+                description: Collection of serialized MailyHerald::OneTimeMailing objects
+                items:
+                  $ref: '#/definitions/OneTimeMailing'
     post:
       operationId: create_new_one_time_mailing
       description: Create new one time mailing.
