@@ -109,6 +109,16 @@ describe "OneTimeMailings API" do
         it { expect(response_json["errors"]["startAt"]).to eq("blank") }
         it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
       end
+
+      context "wrong start_at" do
+        before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: "{{"}}.to_json }
+
+        it { expect(response.status).to eq(422) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["errors"]["startAt"]).to eq("notTime") }
+        it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
+      end
     end
   end
 

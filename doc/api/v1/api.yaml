@@ -755,7 +755,8 @@ paths:
                     description: Has to be previously created mailer.
                   start_at:
                     type: string
-                    description: Date with time as a string.
+                    description: >-
+                      Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
       responses:
         '200':
           description: Success
@@ -819,6 +820,7 @@ paths:
                       type: string
                       enum:
                         - blank
+                        - notTime
 definitions:
   List:
     type: object

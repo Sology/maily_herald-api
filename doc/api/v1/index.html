@@ -3451,7 +3451,7 @@
                                                                                             
                                                                                         </dt>
                                                                                         <dd>
-                                                                                            <p>Date with time as a string.</p>
+                                                                                            <p>Date with time as a string. Can be described with Liquid syntax e.g. &quot;user.created_at | plus: 5, &#39;minutes&#39;&quot;, but it have to return time value.</p>
                                                                             
                                                                                             <div class="json-inner-schema">
                                                                                                 
@@ -3737,6 +3737,8 @@
                                                                                                                                     
                                                                                                                                     <span class="json-property-type">string</span>    <span class="json-property-enum" title="Possible values">, x &isin; {
                                                                                                                                                     <span class="json-property-enum-item">blank</span>
+                                                                                                                                                ,
+                                                                                                                                                    <span class="json-property-enum-item">notTime</span>
                                                                                                                                                 
                                                                                                                                             }
                                                                                                                                             </span>

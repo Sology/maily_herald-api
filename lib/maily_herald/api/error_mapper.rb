@@ -22,6 +22,8 @@ module MailyHerald
                               "syntaxError"
                             elsif error_type.match(/is\ not\ a\ boolean\ value/)
                               "notBoolean"
+                            elsif error_type.match(/is\ not\ a\ time\ value/)
+                              "notTime"
                             else
                               error_type
                             end
