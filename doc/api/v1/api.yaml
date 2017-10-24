@@ -581,6 +581,12 @@ paths:
               errors:
                 type: object
                 properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - locked
                   title:
                     type: array
                     items:

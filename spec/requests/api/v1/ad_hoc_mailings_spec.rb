@@ -324,6 +324,7 @@ describe "AdHocMailings API" do
         it { expect(response_json["adHocMailing"]["state"]).to eq("enabled") }
         it { expect(response_json["adHocMailing"]["mailerName"]).to eq("generic") }
         it { expect(response_json["adHocMailing"]["conditions"]).to eq("active") }
+        it { mailing.reload; expect(mailing.subject).to eq("New Subject") }
       end
 
       context "with incorrect params" do
