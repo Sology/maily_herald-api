@@ -844,6 +844,109 @@ paths:
                 $ref: '#/definitions/OneTimeMailing'
         '404':
           description: MailyHerald::OneTimeMailing not found.
+    put:
+      operationId: update_aone_time_mailing
+      description: Update one time mailing.
+      summary: Update one time mailing.
+      tags:
+        - oneTimeMailings
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::OneTimeMailing.
+          required: true
+          type: integer
+          format: int64
+        - name: one_time_mailing
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              one_time_mailing:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: List's new title. Name will remain unchanged.
+                  subject:
+                    type: string
+                    description: One time mailing's new subject.
+                  template:
+                    type: string
+                    description: One time's new template. Will be validated against Liquid syntax.
+                  list:
+                    type: string
+                    description: Previously created MailyHerald::List object's name.
+                  from:
+                    type: string
+                    description: If not specified, default value will be used.
+                  conditions:
+                    type: string
+                    description: After validation has to return boolean value.
+                  mailer_name:
+                    type: string
+                    description: Has to be previously created mailer.
+                  start_at:
+                    type: string
+                    description: One time mailing's new start_at.
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              oneTimeMailing:
+                $ref: '#/definitions/OneTimeMailing'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - locked
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  template:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - syntaxError
+                  list:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  conditions:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - notBoolean
+                  mailerName:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  startAt:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - notTime
 definitions:
   List:
     type: object
