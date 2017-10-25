@@ -1052,6 +1052,52 @@ paths:
         '404':
           description: MailyHerald::OneTimeMailing or entity not found.
   /periodical_mailings:
+    get:
+      operationId: get_periodical_mailings
+      description: Get all periodical mailings.
+      summary: Get all periodical mailings.
+      tags:
+        - periodicalMailings
+      parameters:
+        - name: periodical_mailing
+          in: body
+          description: >-
+            'Per', 'page', 'query' and 'state' param allowed.
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of periodical mailings returned per page
+              query:
+                type: string
+                description: Filters periodical mailings by name or title.
+              state:
+                type: string
+                description: >-
+                  When not specified all objects are return regardless their state. Allowed states:
+                    - enabled
+                    - disabled
+                    - archived
+                    - not_archived
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              periodicalMailings:
+                type: array
+                description: Collection of serialized MailyHerald::PeriodicalMailing objects
+                items:
+                  $ref: '#/definitions/PeriodicalMailing'
     post:
       operationId: create_new_periodical_mailing
       description: Create new periodical mailing.

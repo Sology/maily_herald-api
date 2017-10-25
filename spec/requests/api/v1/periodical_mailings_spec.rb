@@ -2,6 +2,168 @@ require "rails_helper"
 
 describe "PeriodicalMailings API" do
 
+  describe "GET #index" do
+    let!(:mailing1) { create :weekly_summary }
+    let!(:mailing2) { create :weekly_summary , name: "second_one", title: "second one"}
+
+    it { expect(MailyHerald::PeriodicalMailing.count).to eq(2) }
+
+    context "without any params" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailings"].count).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined per param" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {per: 1} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailings"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_truthy }
+    end
+
+    context "with defined per and page param" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {per: 1, page: 2} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailings"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with too high page param" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {per: 1, page: 10} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailings"].count).to eq(0) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined query param" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {query: query} }
+
+      context "when query is 'week'" do
+        let(:query) { "week" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["periodicalMailings"].count).to eq(1) }
+        it { expect(response_json["periodicalMailings"].first["name"]).to eq("weekly_summary") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "when query is 'sec'" do
+        let(:query) { "sec" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["periodicalMailings"].count).to eq(1) }
+        it { expect(response_json["periodicalMailings"].first["name"]).to eq("second_one") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+    end
+
+    context "with 'state' param" do
+      context "when 'enabled' or 'disabled'" do
+        before do
+          mailing1.disable!
+          mailing1.reload
+          expect(MailyHerald::PeriodicalMailing.enabled.count).to eq(1)
+        end
+
+        context "should return enabled mailings" do
+          before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {state: :enabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["periodicalMailings"].count).to eq(1) }
+          it { expect(response_json["periodicalMailings"].first["state"]).to eq("enabled") }
+          it { expect(response_json["periodicalMailings"].first["name"]).to eq(mailing2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return disabled mailings'" do
+          before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {state: :disabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["periodicalMailings"].count).to eq(1) }
+          it { expect(response_json["periodicalMailings"].first["state"]).to eq("disabled") }
+          it { expect(response_json["periodicalMailings"].first["name"]).to eq(mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+
+      context "when 'archived' or 'not_archived'" do
+        before do
+          mailing1.archive!
+          mailing1.reload
+          expect(MailyHerald::PeriodicalMailing.archived.count).to eq(1)
+        end
+
+        context "should return archived mailings" do
+          before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {state: :archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["periodicalMailings"].count).to eq(1) }
+          it { expect(response_json["periodicalMailings"].first["state"]).to eq("archived") }
+          it { expect(response_json["periodicalMailings"].first["name"]).to eq(mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return enabled and disabled mailings" do
+          before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {state: :not_archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["periodicalMailings"].count).to eq(1) }
+          it { expect(response_json["periodicalMailings"].first["state"]).to eq("enabled") }
+          it { expect(response_json["periodicalMailings"].first["name"]).to eq(mailing2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+    end
+
+    context "'query' and 'state' combined" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings", {state: :enabled, query: "second"} }
+
+      it { expect(MailyHerald::PeriodicalMailing.enabled.count).to eq(2) }
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailings"].count).to eq(1) }
+      it { expect(response_json["periodicalMailings"].first["name"]).to eq(mailing2.name) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+  end
+
   describe "GET #show" do
     let!(:mailing) { create :weekly_summary }
     let(:list)     { mailing.list }

@@ -31,7 +31,7 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :periodical_mailings, except: [:index, :new, :edit]
+      resources :periodical_mailings, except: [:new, :edit]
     end
   end
 
