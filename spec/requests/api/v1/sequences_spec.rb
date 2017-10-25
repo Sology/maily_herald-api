@@ -251,4 +251,31 @@ describe "Sequences API" do
     end
   end
 
+  describe "DELETE #destroy" do
+    let!(:sequence) { create :clean_sequence }
+
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+
+    context "with correct Sequence ID" do
+      before { send_request :delete, "/maily_herald/api/v1/sequences/#{sequence.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["sequence"]["state"]).to eq("archived") }
+      it { expect(MailyHerald::Sequence.count).to eq(1) }
+    end
+
+    context "with incorrect Sequence ID" do
+      before { send_request :delete, "/maily_herald/api/v1/sequences/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+      it { sequence.reload; expect(sequence.state.to_s).to eq("enabled") }
+      it { expect(MailyHerald::Sequence.count).to eq(1) }
+    end
+  end
+
 end
