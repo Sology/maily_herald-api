@@ -31,7 +31,11 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :periodical_mailings, except: [:new, :edit]
+      resources :periodical_mailings, except: [:new, :edit] do
+        member do
+          get  "preview/:entity_id" => :preview
+        end
+      end
     end
   end
 

@@ -1379,6 +1379,35 @@ paths:
                 $ref: '#/definitions/PeriodicalMailing'
         '404':
           description: MailyHerald::PeriodicalMailing not found.
+  '/periodical_mailings/{id}/preview/{entity_id}':
+    get:
+      operationId: get_periodical_mailing_preview
+      description: Get periodical mailing preview for given entity.
+      summary: Get periodical mailing's preview.
+      tags:
+        - mailPreviews
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::PeriodicalMailing.
+          required: true
+          type: integer
+          format: int64
+        - name: entity_id
+          in: path
+          description: ID of a entity e.g. User.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              mailPreview:
+                $ref: '#/definitions/MailPreview'
+        '404':
+          description: MailyHerald::PeriodicalMailing or entity not found.
 definitions:
   List:
     type: object
