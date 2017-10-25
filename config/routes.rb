@@ -31,7 +31,7 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :periodical_mailings, only: [:create, :show]
+      resources :periodical_mailings, only: [:create, :show, :update]
     end
   end
 

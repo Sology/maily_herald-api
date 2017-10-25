@@ -1198,6 +1198,118 @@ paths:
                 $ref: '#/definitions/PeriodicalMailing'
         '404':
           description: MailyHerald::PeriodicalMailing not found.
+    put:
+      operationId: update_periodical_mailing
+      description: Update periodical mailing.
+      summary: Update periodical mailing.
+      tags:
+        - periodicalMailings
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::PeriodicalMailing.
+          required: true
+          type: integer
+          format: int64
+        - name: periodical_mailing
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              periodical_mailing:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: List's new title. Name will remain unchanged.
+                  subject:
+                    type: string
+                    description: Periodical mailing's new subject.
+                  template:
+                    type: string
+                    description: Periodical's new template. Will be validated against Liquid syntax.
+                  list:
+                    type: string
+                    description: Previously created MailyHerald::List object's name.
+                  from:
+                    type: string
+                    description: If not specified, default value will be used.
+                  conditions:
+                    type: string
+                    description: After validation has to return boolean value.
+                  mailer_name:
+                    type: string
+                    description: Has to be previously created mailer.
+                  start_at:
+                    type: string
+                    description: Periodical mailing's new start_at.
+                  period_in_days:
+                    type: integer
+                    description: Amount of time between consecutive mailing deliveries.
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              periodicalMailing:
+                $ref: '#/definitions/PeriodicalMailing'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - locked
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  template:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - syntaxError
+                  list:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  conditions:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - notBoolean
+                  mailerName:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  startAt:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - notTime
+                  period:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - greaterThan0
 definitions:
   List:
     type: object
