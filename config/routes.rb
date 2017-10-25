@@ -17,23 +17,16 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :ad_hoc_mailings, except: [:new, :edit] do
-        member do
-          get  "preview/:entity_id" => :preview
-          post :deliver
-          post "deliver/:entity_id" => :deliver
-        end
-      end
+      %w(ad_hoc_mailings one_time_mailings periodical_mailings).each do |r|
+        resources r.to_sym, except: [:new, :edit] do
+          member do
+            get  "preview/:entity_id" => :preview
 
-      resources :one_time_mailings, except: [:new, :edit] do
-        member do
-          get  "preview/:entity_id" => :preview
-        end
-      end
-
-      resources :periodical_mailings, except: [:new, :edit] do
-        member do
-          get  "preview/:entity_id" => :preview
+            if r.to_sym == :ad_hoc_mailings
+              post :deliver
+              post "deliver/:entity_id" => :deliver
+            end
+          end
         end
       end
     end
