@@ -1243,6 +1243,58 @@ definitions:
       - template
       - listId
       - startAt
+  PeriodicalMailing:
+    type: object
+    description: Serialized MailyHerald::PeriodicalMailing object.
+    properties:
+      id:
+        type: integer
+        description: PeriodicalMailing's ID.
+      name:
+        type: string
+        description: PeriodicalMailing's name based on title.
+      title:
+        type: string
+        description: PeriodicalMailing's title.
+      listId:
+        type: integer
+        description: ID of an associated MailyHerald::List object.
+      subject:
+        type: string
+        description: PeriodicalMailing's subject.
+      template:
+        type: string
+        description: PeriodicalMailing's template.
+      mailerName:
+        type: string
+        description: PeriodicalMailing's mailer's name.
+      conditions:
+        type: string
+        description: PeriodicalMailing's conditions.
+      from:
+        type: string
+        description: >-
+          PeriodicalMailing's alternative 'from' attribute.
+      state:
+        type: string
+        description: PeriodicalMailing's state - can be either enabled, disabled or archived.
+      locked:
+        type: boolean
+        description: Indicates whether mailing is locked or not.
+      startAt:
+        type: string
+        description: PeriodicalMailing's delivery start time. E.g. 2017-10-24T11:11:55.526+02:00
+      periodInDays:
+        type: string
+        description: PeriodicalMailing's delivery period in days. E.g. 7.00
+    required:
+      - name
+      - title
+      - subject
+      - template
+      - listId
+      - startAt
+      - periodInDays
   MailPreview:
     type: object
     description: Serialized Mail::Message object.
