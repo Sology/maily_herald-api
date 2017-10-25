@@ -677,7 +677,7 @@ paths:
         '404':
           description: MailyHerald::AdHocMailing or entity not found.
   '/ad_hoc_mailings/{id}/deliver':
-    get:
+    post:
       operationId: schedule_ad_hoc_mailing_for_all_entities
       description: Schedule ad hoc mailing for all enities.
       summary: Schedule ad hoc mailing for all enities.
@@ -696,7 +696,7 @@ paths:
         '404':
           description: MailyHerald::AdHocMailing not found.
   '/ad_hoc_mailings/{id}/deliver/{entity_id}':
-    get:
+    post:
       operationId: schedule_ad_hoc_mailing_for_entity
       description: Schedule ad hoc mailing for given entity.
       summary: Schedule ad hoc mailing for given entity.
