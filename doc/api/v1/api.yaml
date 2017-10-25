@@ -1509,6 +1509,83 @@ paths:
                 $ref: '#/definitions/Sequence'
         '404':
           description: MailyHerald::Sequence not found.
+    put:
+      operationId: update_sequence
+      description: Update sequence.
+      summary: Update sequence.
+      tags:
+        - sequences
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::Sequence.
+          required: true
+          type: integer
+          format: int64
+        - name: sequence
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              sequence:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: List's new title. Name will remain unchanged.
+                  list:
+                    type: string
+                    description: Previously created MailyHerald::Sequence object's name.
+                  state:
+                    type: string
+                    description: >-
+                      One of following allowed: (any other input will be omitted)
+                        - enabled
+                        - disabled
+                        - archived
+                  start_at:
+                    type: string
+                    description: Sequence's new start_at.
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              sequence:
+                $ref: '#/definitions/Sequence'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - locked
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  list:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  startAt:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - notTime
 definitions:
   List:
     type: object

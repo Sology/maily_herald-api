@@ -199,4 +199,56 @@ describe "Sequences API" do
     end
   end
 
+  describe "PUT #update" do
+    let!(:sequence) { create :clean_sequence }
+    let(:start_at)  { "user.created_at + 5.minutes" }
+
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+
+    context "with incorrect Sequence ID" do
+      before { send_request :put, "/maily_herald/api/v1/sequences/0", {sequence: {title: "New Title", state: "enabled", start_at: start_at}}.to_json }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct Sequence ID" do
+      context "with correct params" do
+        before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}", {sequence: {title: "New Title", state: "enabled", start_at: start_at}}.to_json }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequence"]["title"]).to eq("New Title") }
+        it { expect(response_json["sequence"]["state"]).to eq("enabled") }
+        it { expect(response_json["sequence"]["startAt"]).to eq(start_at) }
+        it { sequence.reload; expect(sequence.title).to eq("New Title") }
+      end
+
+      context "with incorrect params" do
+        context "blanks" do
+          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}", {sequence: {title: "", list: "", start_at: ""}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["title"]).to eq("blank") }
+          it { expect(response_json["errors"]["list"]).to eq("blank") }
+          it { expect(response_json["errors"]["startAt"]).to eq("blank") }
+        end
+
+        context "wrong start_at" do
+          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}", {sequence: {start_at: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["startAt"]).to eq("notTime") }
+        end
+      end
+    end
+  end
+
 end
