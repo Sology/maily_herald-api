@@ -296,4 +296,31 @@ describe "PeriodicalMailings API" do
     end
   end
 
+  describe "DELETE #destroy" do
+    let!(:mailing) { create :weekly_summary }
+
+    it { expect(MailyHerald::PeriodicalMailing.count).to eq(1) }
+
+    context "with correct PeriodicalMailing ID" do
+      before { send_request :delete, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailing"]["state"]).to eq("archived") }
+      it { expect(MailyHerald::PeriodicalMailing.count).to eq(1) }
+    end
+
+    context "with incorrect PeriodicalMailing ID" do
+      before { send_request :delete, "/maily_herald/api/v1/periodical_mailings/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+      it { mailing.reload; expect(mailing.state.to_s).to eq("enabled") }
+      it { expect(MailyHerald::PeriodicalMailing.count).to eq(1) }
+    end
+  end
+
 end

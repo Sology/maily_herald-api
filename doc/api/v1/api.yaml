@@ -1310,6 +1310,29 @@ paths:
                       type: string
                       enum:
                         - greaterThan0
+    delete:
+      operationId: archive_periodical_mailing
+      description: >-
+        We does not allow to destroy mailing - instead its state is changed to 'archived'.
+      summary: Archiving mailing.
+      tags:
+        - periodicalMailings
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::PeriodicalMailing.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              periodicalMailing:
+                $ref: '#/definitions/PeriodicalMailing'
+        '404':
+          description: MailyHerald::PeriodicalMailing not found.
 definitions:
   List:
     type: object
