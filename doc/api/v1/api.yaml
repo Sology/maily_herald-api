@@ -567,6 +567,13 @@ paths:
                   mailer_name:
                     type: string
                     description: Has to be previously created mailer.
+                  state:
+                    type: string
+                    description: >-
+                      One of following allowed: (any other input will be omitted)
+                        - enabled
+                        - disabled
+                        - archived
       responses:
         '200':
           description: Success
@@ -944,6 +951,13 @@ paths:
                   start_at:
                     type: string
                     description: One time mailing's new start_at.
+                  state:
+                    type: string
+                    description: >-
+                      One of following allowed: (any other input will be omitted)
+                        - enabled
+                        - disabled
+                        - archived
       responses:
         '200':
           description: Success
@@ -1298,6 +1312,13 @@ paths:
                   period_in_days:
                     type: integer
                     description: Amount of time between consecutive mailing deliveries.
+                  state:
+                    type: string
+                    description: >-
+                      One of following allowed: (any other input will be omitted)
+                        - enabled
+                        - disabled
+                        - archived
       responses:
         '200':
           description: Success
