@@ -1652,6 +1652,89 @@ definitions:
       - listId
       - startAt
       - periodInDays
+  Sequence:
+    type: object
+    description: Serialized MailyHerald::Sequence object.
+    properties:
+      id:
+        type: integer
+        description: Sequence's ID.
+      listId:
+        type: integer
+        description: ID of an associated MailyHerald::List object.
+      name:
+        type: string
+        description: Sequence's name based on title.
+      title:
+        type: string
+        description: Sequence's title.
+      state:
+        type: string
+        description: Sequence's state - can be either enabled, disabled or archived.
+      locked:
+        type: boolean
+        description: Indicates whether sequence is locked or not.
+      startAt:
+        type: string
+        description: Sequence's mailings delivery start time. E.g. 2017-10-24T11:11:55.526+02:00
+      sequenceMailings:
+        type: array
+        description: Collection of serialized MailyHerald::SequenceMailing objects.
+        items:
+          $ref: '#/definitions/SequenceMailing'
+    required:
+      - name
+      - title
+      - listId
+      - startAt
+  SequenceMailing:
+    type: object
+    description: Serialized MailyHerald::SequenceMailing object.
+    properties:
+      id:
+        type: integer
+        description: SequenceMailing's ID.
+      sequenceId:
+        type: integer
+        description: ID of an associated MailyHerald::Sequence object.
+      name:
+        type: string
+        description: SequenceMailing's name based on title.
+      title:
+        type: string
+        description: SequenceMailing's title.
+      subject:
+        type: string
+        description: SequenceMailing's subject.
+      template:
+        type: string
+        description: SequenceMailing's template.
+      mailerName:
+        type: string
+        description: SequenceMailing's mailer's name.
+      conditions:
+        type: string
+        description: SequenceMailing's conditions.
+      from:
+        type: string
+        description: >-
+          SequenceMailing's alternative 'from' attribute.
+      state:
+        type: string
+        description: SequenceMailing's state - can be either enabled, disabled or archived.
+      locked:
+        type: boolean
+        description: Indicates whether sequence mailing is locked or not.
+      absoluteDelayInDays:
+        type: string
+        description: Specified amount of time after starting the sequence when mailing is delivered. E.g 0.25
+    required:
+      - sequenceId
+      - name
+      - title
+      - subject
+      - template
+      - absoluteDelayInDays
   MailPreview:
     type: object
     description: Serialized Mail::Message object.

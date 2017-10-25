@@ -1,4 +1,14 @@
 FactoryGirl.define do
+  factory :clean_sequence, class: "MailyHerald::Sequence" do
+    type "MailyHerald::Sequence"
+    mailer_name "generic"
+    name "clean_sequence"
+    title "Clean Sequence"
+    list :generic_list
+    start_at "user.created_at"
+    state "enabled"
+  end
+
   factory :newsletters, class: "MailyHerald::Sequence" do
     type "MailyHerald::Sequence"
     mailer_name "generic"
