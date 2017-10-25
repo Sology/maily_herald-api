@@ -17,7 +17,7 @@ MailyHerald::Engine.routes.draw do
         end
       end
 
-      resources :sequences, only: :create
+      resources :sequences, only: [:create, :show]
 
       %w(ad_hoc_mailings one_time_mailings periodical_mailings).each do |r|
         resources r.to_sym, except: [:new, :edit] do
