@@ -1435,6 +1435,52 @@ paths:
         '404':
           description: MailyHerald::PeriodicalMailing or entity not found.
   /sequences:
+    get:
+      operationId: get_sequences
+      description: Get all sequences.
+      summary: Get all sequences.
+      tags:
+        - sequences
+      parameters:
+        - name: sequence
+          in: body
+          description: >-
+            'Per', 'page', 'query' and 'state' param allowed.
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of sequences returned per page
+              query:
+                type: string
+                description: Filters sequences by name or title.
+              state:
+                type: string
+                description: >-
+                  When not specified all objects are return regardless their state. Allowed states:
+                    - enabled
+                    - disabled
+                    - archived
+                    - not_archived
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              sequences:
+                type: array
+                description: Collection of serialized MailyHerald::Sequence objects
+                items:
+                  $ref: '#/definitions/Sequence'
     post:
       operationId: create_new_sequence
       description: Create new sequence.

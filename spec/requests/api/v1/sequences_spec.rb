@@ -2,6 +2,166 @@ require "rails_helper"
 
 describe "Sequences API" do
 
+  describe "GET #index" do
+    let!(:sequence1) { create :clean_sequence }
+    let!(:sequence2) { create :newsletters }
+
+    context "without any params" do
+      before { send_request :get, "/maily_herald/api/v1/sequences" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["sequences"].count).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined per param" do
+      before { send_request :get, "/maily_herald/api/v1/sequences", {per: 1} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["sequences"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_truthy }
+    end
+
+    context "with defined per and page param" do
+      before { send_request :get, "/maily_herald/api/v1/sequences", {per: 1, page: 2} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["sequences"].count).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(2) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with too high page param" do
+      before { send_request :get, "/maily_herald/api/v1/sequences", {per: 1, page: 10} }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["sequences"].count).to eq(0) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+
+    context "with defined query param" do
+      before { send_request :get, "/maily_herald/api/v1/sequences", {query: query} }
+
+      context "when query is 'cle'" do
+        let(:query) { "cle" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequences"].count).to eq(1) }
+        it { expect(response_json["sequences"].first["name"]).to eq("clean_sequence") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "when query is 'news'" do
+        let(:query) { "news" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequences"].count).to eq(1) }
+        it { expect(response_json["sequences"].first["name"]).to eq("newsletters") }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+    end
+
+    context "with 'state' param" do
+      context "when 'enabled' or 'disabled'" do
+        before do
+          sequence1.disable!
+          sequence1.reload
+          expect(MailyHerald::Sequence.enabled.count).to eq(1)
+        end
+
+        context "should return enabled sequences" do
+          before { send_request :get, "/maily_herald/api/v1/sequences", {state: :enabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequences"].count).to eq(1) }
+          it { expect(response_json["sequences"].first["state"]).to eq("enabled") }
+          it { expect(response_json["sequences"].first["name"]).to eq(sequence2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return disabled sequences'" do
+          before { send_request :get, "/maily_herald/api/v1/sequences", {state: :disabled} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequences"].count).to eq(1) }
+          it { expect(response_json["sequences"].first["state"]).to eq("disabled") }
+          it { expect(response_json["sequences"].first["name"]).to eq(sequence1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+
+      context "when 'archived' or 'not_archived'" do
+        before do
+          sequence1.archive!
+          sequence1.reload
+          expect(MailyHerald::Sequence.archived.count).to eq(1)
+        end
+
+        context "should return archived sequences" do
+          before { send_request :get, "/maily_herald/api/v1/sequences", {state: :archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequences"].count).to eq(1) }
+          it { expect(response_json["sequences"].first["state"]).to eq("archived") }
+          it { expect(response_json["sequences"].first["name"]).to eq(sequence1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "should return enabled and disabled sequences" do
+          before { send_request :get, "/maily_herald/api/v1/sequences", {state: :not_archived} }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequences"].count).to eq(1) }
+          it { expect(response_json["sequences"].first["state"]).to eq("enabled") }
+          it { expect(response_json["sequences"].first["name"]).to eq(sequence2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+    end
+
+    context "'query' and 'state' combined" do
+      before { send_request :get, "/maily_herald/api/v1/sequences", {state: :enabled, query: "clean"} }
+
+      it { expect(MailyHerald::Sequence.enabled.count).to eq(2) }
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["sequences"].count).to eq(1) }
+      it { expect(response_json["sequences"].first["name"]).to eq(sequence1.name) }
+      it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+      it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+    end
+  end
+
   describe "GET #show" do
     context "without sequence mailings" do
       let!(:sequence) { create :clean_sequence }
