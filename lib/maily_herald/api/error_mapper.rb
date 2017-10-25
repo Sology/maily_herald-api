@@ -24,6 +24,8 @@ module MailyHerald
                               "notBoolean"
                             elsif error_type.match(/is\ not\ a\ time\ value/)
                               "notTime"
+                            elsif error_type.match(/greater_than/)
+                              "greaterThan#{e[1].first[:value]}"
                             else
                               error_type
                             end

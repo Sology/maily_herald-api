@@ -30,6 +30,8 @@ MailyHerald::Engine.routes.draw do
           get  "preview/:entity_id" => :preview
         end
       end
+
+      resources :periodical_mailings, only: :create
     end
   end
 

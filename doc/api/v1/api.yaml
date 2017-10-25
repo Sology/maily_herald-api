@@ -1051,6 +1051,130 @@ paths:
                 $ref: '#/definitions/MailPreview'
         '404':
           description: MailyHerald::OneTimeMailing or entity not found.
+  /periodical_mailings:
+    post:
+      operationId: create_new_periodical_mailing
+      description: Create new periodical mailing.
+      summary: Create new periodical mailing.
+      tags:
+        - periodicalMailings
+      parameters:
+        - name: periodical_mailing
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              periodical_mailing:
+                type: object
+                properties:
+                  title:
+                    required: true
+                    type: string
+                    description: >-
+                      Periodical mailing's new title.
+                      Name will defined from this attribute e.g.:
+                        - 'New periodical mailing' will have name 'new_periodical_mailing'
+                        - 'NewPeriodicalMailing' will have name 'newperiodicalmailing'
+                  subject:
+                    required: true
+                    type: string
+                    description: Periodical mailing's subject.
+                  template:
+                    required: true
+                    type: string
+                    description: Periodical mailing's template. Will be validated against Liquid syntax.
+                  list:
+                    required: true
+                    type: string
+                    description: Previously created MailyHerald::List object's name.
+                  from:
+                    type: string
+                    description: If not specified, default value will be used.
+                  conditions:
+                    type: string
+                    description: After validation has to return boolean value.
+                  mailer_name:
+                    type: string
+                    description: Has to be previously created mailer.
+                  start_at:
+                    type: string
+                    description: >-
+                      Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
+                  period_in_days:
+                    type: integer
+                    description: Amount of time between consecutive mailing deliveries.
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              periodicalMailing:
+                $ref: '#/definitions/PeriodicalMailing'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  subject:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  template:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  list:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  conditions:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - notBoolean
+                  mailerName:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  startAt:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - notTime
+                  period:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - greaterThan0
 definitions:
   List:
     type: object
