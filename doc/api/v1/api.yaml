@@ -803,9 +803,11 @@ paths:
                     type: string
                     description: After validation has to return boolean value.
                   mailer_name:
+                    required: true
                     type: string
                     description: Has to be previously created mailer.
                   start_at:
+                    required: true
                     type: string
                     description: >-
                       Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
@@ -1141,13 +1143,16 @@ paths:
                     type: string
                     description: After validation has to return boolean value.
                   mailer_name:
+                    required: true
                     type: string
                     description: Has to be previously created mailer.
                   start_at:
+                    required: true
                     type: string
                     description: >-
                       Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
                   period_in_days:
+                    required: true
                     type: integer
                     description: Amount of time between consecutive mailing deliveries.
       responses:
@@ -1408,6 +1413,79 @@ paths:
                 $ref: '#/definitions/MailPreview'
         '404':
           description: MailyHerald::PeriodicalMailing or entity not found.
+  /sequences:
+    post:
+      operationId: create_new_sequence
+      description: Create new sequence.
+      summary: Create new sequence.
+      tags:
+        - sequences
+      parameters:
+        - name: sequence
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              sequence:
+                type: object
+                properties:
+                  title:
+                    required: true
+                    type: string
+                    description: >-
+                      Sequence's new title.
+                      Name will defined from this attribute e.g.:
+                        - 'New Sequence' will have name 'new_sequence'
+                        - 'NewSequence' will have name 'newsequence'
+                  list:
+                    required: true
+                    type: string
+                    description: Previously created MailyHerald::List object's name.
+                  start_at:
+                    required: true
+                    type: string
+                    description: >-
+                      Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              sequence:
+                $ref: '#/definitions/Sequence'
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  list:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  startAt:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - notTime
 definitions:
   List:
     type: object
