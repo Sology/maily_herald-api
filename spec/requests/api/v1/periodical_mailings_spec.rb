@@ -2,6 +2,48 @@ require "rails_helper"
 
 describe "PeriodicalMailings API" do
 
+  describe "GET #show" do
+    let!(:mailing) { create :weekly_summary }
+    let(:list)     { mailing.list }
+
+    it { expect(MailyHerald::PeriodicalMailing.count).to eq(1) }
+
+    context "with incorrect PeriodicalMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings/0" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct PeriodicalMailing ID" do
+      before { send_request :get, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["periodicalMailing"]).to eq(
+            {
+              "id"            =>  mailing.id,
+              "listId"        =>  list.id,
+              "name"          =>  "weekly_summary",
+              "title"         =>  "Test periodical mailing",
+              "subject"       =>  "Weekly summary",
+              "template"      =>  "User name: {{user.name}}.",
+              "conditions"    =>  "user.weekly_notifications == true",
+              "from"          =>  nil,
+              "state"         =>  "enabled",
+              "mailerName"    =>  "generic",
+              "startAt"       =>  "user.created_at",
+              "locked"        =>  false,
+              "periodInDays"  =>  "7.00"
+           }
+         )
+        }
+    end
+  end
+
   describe "POST #create" do
     let(:list)     { MailyHerald.list :generic_list }
     let(:start_at) { Time.now + 1.minute }
