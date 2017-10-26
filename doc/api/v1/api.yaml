@@ -401,7 +401,8 @@ paths:
                   $ref: '#/definitions/AdHocMailing'
     post:
       operationId: create_new_ad_hoc_mailing
-      description: Create new ad hoc mailing.
+      description: >-
+        Create new ad hoc mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
       summary: Create new ad hoc mailing.
       tags:
         - adHocMailings
@@ -771,7 +772,8 @@ paths:
     post:
       operationId: create_new_one_time_mailing
       description: Create new one time mailing.
-      summary: Create new one time mailing.
+      summary: >-
+        Create new one time mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
       tags:
         - oneTimeMailings
       parameters:
@@ -1119,7 +1121,8 @@ paths:
     post:
       operationId: create_new_periodical_mailing
       description: Create new periodical mailing.
-      summary: Create new periodical mailing.
+      summary: >-
+        Create new periodical mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
       tags:
         - periodicalMailings
       parameters:
@@ -1731,7 +1734,8 @@ paths:
     post:
       operationId: create_new_sequence_mailing
       description: Create new sequence mailing.
-      summary: Create new sequence mailing.
+      summary: >-
+        Create new sequence mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
       tags:
         - sequenceMailings
       parameters:

@@ -288,7 +288,7 @@ describe "OneTimeMailings API" do
         it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
       end
 
-      context "nil subject" do
+      context "nil subject when generic mailer" do
         before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {title: "New oneTimeMailing", list: "generic_list", template: "Hello!", start_at: start_at}}.to_json }
 
         it { expect(response.status).to eq(422) }
@@ -298,7 +298,7 @@ describe "OneTimeMailings API" do
         it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
       end
 
-      context "nil template" do
+      context "nil template when generic mailer" do
         before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", start_at: start_at}}.to_json }
 
         it { expect(response.status).to eq(422) }

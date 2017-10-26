@@ -309,7 +309,7 @@ describe "SequenceMailings API" do
           it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
         end
 
-        context "nil subject" do
+        context "nil subject when generic mailer" do
           before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
 
           it { expect(response.status).to eq(422) }
@@ -319,7 +319,7 @@ describe "SequenceMailings API" do
           it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
         end
 
-        context "nil template" do
+        context "nil template when generic mailer" do
           before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", absolute_delay_in_days: 0.04}}.to_json }
 
           it { expect(response.status).to eq(422) }

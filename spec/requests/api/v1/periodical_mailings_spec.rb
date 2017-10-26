@@ -286,7 +286,7 @@ describe "PeriodicalMailings API" do
         it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
       end
 
-      context "nil subject" do
+      context "nil subject when generic mailer" do
         before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", template: "Hello!", start_at: start_at, period_in_days: 7}}.to_json }
 
         it { expect(response.status).to eq(422) }
@@ -296,7 +296,7 @@ describe "PeriodicalMailings API" do
         it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
       end
 
-      context "nil template" do
+      context "nil template when generic mailer" do
         before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", start_at: start_at, period_in_days: 7}}.to_json }
 
         it { expect(response.status).to eq(422) }
