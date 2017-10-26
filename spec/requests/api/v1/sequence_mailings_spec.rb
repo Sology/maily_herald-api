@@ -2,20 +2,20 @@ require "rails_helper"
 
 describe "SequenceMailings API" do
 
-  let!(:sequence) { create :clean_sequence }
-
-  it { expect(MailyHerald::Sequence.count).to eq(1) }
-  it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
-
   describe "POST #create" do
-    context "with incorrect sequence ID" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/0/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+    let!(:sequence) { create :clean_sequence }
 
-          it { expect(response.status).to eq(404) }
-          it { expect(response).not_to be_success }
-          it { expect(response_json).not_to be_empty }
-          it { expect(response_json["error"]).to eq("notFound") }
-          it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+    it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
+
+    context "with incorrect sequence ID" do
+      before { send_request :post, "/maily_herald/api/v1/sequences/0/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+      it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
     end
 
     context "with correct sequence ID" do
@@ -165,6 +165,90 @@ describe "SequenceMailings API" do
              }
            )
           }
+      end
+    end
+  end
+
+  describe "PUT #update" do
+    let!(:sequence) { create :newsletters }
+    let!(:mailing) { sequence.mailings.first }
+
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+    it { expect(MailyHerald::SequenceMailing.count).to eq(3) }
+
+    context "with incorrect Sequence ID" do
+      before { send_request :put, "/maily_herald/api/v1/sequences/0/mailings/#{mailing.id}", {sequence_mailing: {subject: "New Subject"}}.to_json }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct Sequence ID" do
+      context "with incorrect SequenceMailing ID" do
+        before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/0", {sequence_mailing: {subject: "New Subject"}}.to_json }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+      end
+
+      context "with correct SequenceMailing ID" do
+        context "with correct params" do
+          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {subject: "New Subject", template: "New Template", conditions: "active", state: "enabled", absolute_delay_in_days: 10}}.to_json }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequenceMailing"]["subject"]).to eq("New Subject") }
+          it { expect(response_json["sequenceMailing"]["template"]).to eq("New Template") }
+          it { expect(response_json["sequenceMailing"]["state"]).to eq("enabled") }
+          it { expect(response_json["sequenceMailing"]["conditions"]).to eq("active") }
+          it { expect(response_json["sequenceMailing"]["absoluteDelayInDays"]).to eq("10.00") }
+          it { mailing.reload; expect(mailing.subject).to eq("New Subject") }
+        end
+
+        context "with incorrect params" do
+          context "blanks" do
+            before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {title: "", subject: "", template: ""}}.to_json }
+
+            it { expect(response.status).to eq(422) }
+            it { expect(response).not_to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["errors"]["title"]).to eq("blank") }
+            it { expect(response_json["errors"]["subject"]).to eq("blank") }
+            it { expect(response_json["errors"]["template"]).to eq("blank") }
+          end
+
+          context "not setup mailer" do
+            before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {mailer_name: "wrongOne"}}.to_json }
+
+            it { expect(response.status).to eq(422) }
+            it { expect(response).not_to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["errors"]["mailerName"]).to eq("invalid") }
+          end
+
+          context "wrong conditions" do
+            before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {conditions: "{{"}}.to_json }
+
+            it { expect(response.status).to eq(422) }
+            it { expect(response).not_to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["errors"]["conditions"]).to eq("notBoolean") }
+          end
+
+          context "wrong template" do
+            before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {template: "{{"}}.to_json }
+
+            it { expect(response.status).to eq(422) }
+            it { expect(response).not_to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+          end
+        end
       end
     end
   end
