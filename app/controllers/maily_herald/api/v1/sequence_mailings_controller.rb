@@ -1,7 +1,7 @@
 module MailyHerald
   module Api
     module V1
-      class SequenceMailingsController < DispatchesController
+      class SequenceMailingsController < MailingsController
         before_action :load_sequence
 
         def create
