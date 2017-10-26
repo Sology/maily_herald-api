@@ -1929,6 +1929,35 @@ paths:
                       type: string
                       enum:
                         - invalid
+    delete:
+      operationId: archive_sequence_mailing
+      description: >-
+        We does not allow to destroy sequence mailings - instead its state is changed to 'archived'.
+      summary: Archiving sequence mailing.
+      tags:
+        - sequenceMailings
+      parameters:
+        - name: sequence_id
+          in: path
+          description: ID of a MailyHerald::Sequence.
+          required: true
+          type: integer
+          format: int64
+        - name: id
+          in: path
+          description: ID of a MailyHerald::SequenceMailing.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              sequenceMailing:
+                $ref: '#/definitions/SequenceMailing'
+        '404':
+          description: MailyHerald::Sequence or MailyHerald::SequenceMailing not found.
 definitions:
   List:
     type: object
