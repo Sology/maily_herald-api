@@ -1680,6 +1680,54 @@ paths:
         '404':
           description: MailyHerald::Sequence not found.
   '/sequences/{sequence_id}/mailings':
+    get:
+      operationId: get_sequence_mailings
+      description: Get all sequence mailings.
+      summary: Get all sequences mailings.
+      tags:
+        - sequenceMailings
+      parameters:
+        - name: sequence_mailing
+          in: body
+          description: >-
+            'Per', 'page', 'query' and 'state' param allowed.
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of sequence mailings returned per page
+              query:
+                type: string
+                description: Filters sequence mailings by name or title.
+              state:
+                type: string
+                description: >-
+                  When not specified all objects are return regardless their state. Allowed states:
+                    - enabled
+                    - disabled
+                    - archived
+                    - not_archived
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              sequenceMailings:
+                type: array
+                description: Collection of serialized MailyHerald::SequenceMailing objects
+                items:
+                  $ref: '#/definitions/SequenceMailing'
+        '404':
+          description: MailyHerald::Sequence not found.
     post:
       operationId: create_new_sequence_mailing
       description: Create new sequence mailing.

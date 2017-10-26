@@ -2,6 +2,232 @@ require "rails_helper"
 
 describe "SequenceMailings API" do
 
+  describe "GET #index" do
+    let!(:sequence) { create :newsletters }
+    let!(:mailing1) { sequence.mailings.first }
+    let!(:mailing2) { sequence.mailings.second }
+
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+    it { expect(MailyHerald::SequenceMailing.count).to eq(3) }
+    it { expect(mailing1).not_to be_nil }
+    it { expect(mailing2).not_to be_nil }
+
+    context "with incorrect Sequence ID" do
+      before { send_request :get, "/maily_herald/api/v1/sequences/0/mailings" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct Sequence ID" do
+      context "without any params" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailings"].count).to eq(3) }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "with defined per param" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {per: 1} }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailings"].count).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_truthy }
+      end
+
+      context "with defined per and page param" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {per: 1, page: 3} }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailings"].count).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(3) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "with too high page param" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {per: 1, page: 10} }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailings"].count).to eq(0) }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(10) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+
+      context "with defined query param" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {query: query} }
+
+        context "when query is 'ini'" do
+          let(:query) { "ini" }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequenceMailings"].count).to eq(1) }
+          it { expect(response_json["sequenceMailings"].first["name"]).to eq(mailing1.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+
+        context "when query is 'sec'" do
+          let(:query) { "sec" }
+
+          it { expect(response.status).to eq(200) }
+          it { expect(response).to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["sequenceMailings"].count).to eq(1) }
+          it { expect(response_json["sequenceMailings"].first["name"]).to eq(mailing2.name) }
+          it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+          it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+        end
+      end
+
+      context "with 'state' param" do
+        context "when 'enabled' or 'disabled'" do
+          before do
+            mailing1.disable!
+            mailing1.reload
+            expect(MailyHerald::SequenceMailing.enabled.count).to eq(2)
+          end
+
+          context "should return enabled sequence mailings" do
+            before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {state: :enabled} }
+
+            it { expect(response.status).to eq(200) }
+            it { expect(response).to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["sequenceMailings"].count).to eq(2) }
+            it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+            it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+          end
+
+          context "should return disabled sequence mailings'" do
+            before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {state: :disabled} }
+
+            it { expect(response.status).to eq(200) }
+            it { expect(response).to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["sequenceMailings"].count).to eq(1) }
+            it { expect(response_json["sequenceMailings"].first["state"]).to eq("disabled") }
+            it { expect(response_json["sequenceMailings"].first["name"]).to eq(mailing1.name) }
+            it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+            it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+          end
+        end
+
+        context "when 'archived' or 'not_archived'" do
+          before do
+            mailing1.archive!
+            mailing1.reload
+            expect(MailyHerald::SequenceMailing.archived.count).to eq(1)
+          end
+
+          context "should return archived sequence mailings" do
+            before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {state: :archived} }
+
+            it { expect(response.status).to eq(200) }
+            it { expect(response).to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["sequenceMailings"].count).to eq(1) }
+            it { expect(response_json["sequenceMailings"].first["state"]).to eq("archived") }
+            it { expect(response_json["sequenceMailings"].first["name"]).to eq(mailing1.name) }
+            it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+            it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+          end
+
+          context "should return enabled and disabled sequence mailings" do
+            before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {state: :not_archived} }
+
+            it { expect(response.status).to eq(200) }
+            it { expect(response).to be_success }
+            it { expect(response_json).not_to be_empty }
+            it { expect(response_json["sequenceMailings"].count).to eq(2) }
+            it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+            it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+          end
+        end
+      end
+
+      context "'query' and 'state' combined" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {state: :enabled, query: "init"} }
+
+        it { expect(MailyHerald::SequenceMailing.enabled.count).to eq(3) }
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailings"].count).to eq(1) }
+        it { expect(response_json["sequenceMailings"].first["name"]).to eq(mailing1.name) }
+        it { expect(response_json["meta"]["pagination"]["page"]).to eq(1) }
+        it { expect(response_json["meta"]["pagination"]["nextPage"]).to be_falsy }
+      end
+    end
+  end
+
+  describe "GET #show" do
+    let!(:sequence) { create :newsletters }
+    let!(:mailing) { sequence.mailings.first }
+
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+    it { expect(MailyHerald::SequenceMailing.count).to eq(3) }
+
+    context "with incorrect Sequence ID" do
+      before { send_request :get, "/maily_herald/api/v1/sequences/0/mailings/#{mailing.id}" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct Sequence ID" do
+      context "with incorrect SequenceMailing ID" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/0" }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+      end
+
+      context "with correct SequenceMailing ID" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailing"]).to eq(
+              {
+                "id"                   =>  mailing.id,
+                "sequenceId"           =>  sequence.id,
+                "name"                 =>  mailing.name,
+                "title"                =>  mailing.title,
+                "subject"              =>  mailing.subject,
+                "template"             =>  mailing.template,
+                "conditions"           =>  mailing.conditions,
+                "from"                 =>  mailing.from,
+                "state"                =>  mailing.state.to_s,
+                "mailerName"           =>  mailing.mailer_name.to_s,
+                "locked"               =>  mailing.locked?,
+                "absoluteDelayInDays"  =>  mailing.absolute_delay_in_days
+             }
+           )
+          }
+      end
+    end
+  end
+
   describe "POST #create" do
     let!(:sequence) { create :clean_sequence }
 
@@ -112,59 +338,6 @@ describe "SequenceMailings API" do
           it { expect(response_json["errors"]["absoluteDelay"]).to eq("blank") }
           it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
         end
-      end
-    end
-  end
-
-  describe "GET #show" do
-    let!(:sequence) { create :newsletters }
-    let!(:mailing) { sequence.mailings.first }
-
-    it { expect(MailyHerald::Sequence.count).to eq(1) }
-    it { expect(MailyHerald::SequenceMailing.count).to eq(3) }
-
-    context "with incorrect Sequence ID" do
-      before { send_request :get, "/maily_herald/api/v1/sequences/0/mailings/#{mailing.id}" }
-
-      it { expect(response.status).to eq(404) }
-      it { expect(response).not_to be_success }
-      it { expect(response_json).not_to be_empty }
-      it { expect(response_json["error"]).to eq("notFound") }
-    end
-
-    context "with correct Sequence ID" do
-      context "with incorrect SequenceMailing ID" do
-        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/0" }
-
-        it { expect(response.status).to eq(404) }
-        it { expect(response).not_to be_success }
-        it { expect(response_json).not_to be_empty }
-        it { expect(response_json["error"]).to eq("notFound") }
-      end
-
-      context "with correct SequenceMailing ID" do
-        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}" }
-
-        it { expect(response.status).to eq(200) }
-        it { expect(response).to be_success }
-        it { expect(response_json).not_to be_empty }
-        it { expect(response_json["sequenceMailing"]).to eq(
-              {
-                "id"                   =>  mailing.id,
-                "sequenceId"           =>  sequence.id,
-                "name"                 =>  mailing.name,
-                "title"                =>  mailing.title,
-                "subject"              =>  mailing.subject,
-                "template"             =>  mailing.template,
-                "conditions"           =>  mailing.conditions,
-                "from"                 =>  mailing.from,
-                "state"                =>  mailing.state.to_s,
-                "mailerName"           =>  mailing.mailer_name.to_s,
-                "locked"               =>  mailing.locked?,
-                "absoluteDelayInDays"  =>  mailing.absolute_delay_in_days
-             }
-           )
-          }
       end
     end
   end
