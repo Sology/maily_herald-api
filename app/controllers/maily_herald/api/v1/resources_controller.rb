@@ -17,6 +17,7 @@ module MailyHerald
 
         def create
           @item = resource.new
+          yield(@item) if block_given?
           assign_attributes_and_render_response
         end
 

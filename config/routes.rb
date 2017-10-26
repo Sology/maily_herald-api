@@ -20,7 +20,9 @@ MailyHerald::Engine.routes.draw do
       %w(sequences ad_hoc_mailings one_time_mailings periodical_mailings).each do |r|
         res = r.to_sym
         resources res, except: [:new, :edit] do
-          unless res == :sequences
+          if res == :sequences
+            resources "sequence_mailings", as: "mailings", path: "mailings", only: :create
+          else
             member do
               get  "preview/:entity_id" => :preview
 

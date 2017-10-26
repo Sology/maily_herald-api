@@ -1676,6 +1676,118 @@ paths:
                 $ref: '#/definitions/Sequence'
         '404':
           description: MailyHerald::Sequence not found.
+  '/sequences/{sequence_id}/mailings':
+    post:
+      operationId: create_new_sequence_mailing
+      description: Create new sequence mailing.
+      summary: Create new sequence mailing.
+      tags:
+        - sequenceMailings
+      parameters:
+        - name: sequence_id
+          in: path
+          description: ID of a MailyHerald::Sequence.
+          required: true
+          type: integer
+          format: int64
+        - name: sequence_mailing
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              sequence_mailing:
+                type: object
+                properties:
+                  title:
+                    required: true
+                    type: string
+                    description: >-
+                      Sequence mailing's new title.
+                      Name will defined from this attribute e.g.:
+                        - 'New sequence mailing' will have name 'new_sequence_mailing'
+                        - 'NewSequenceMailing' will have name 'newsequencemailing'
+                  subject:
+                    required: true
+                    type: string
+                    description: Sequence mailing's subject.
+                  template:
+                    required: true
+                    type: string
+                    description: Sequence mailing's template. Will be validated against Liquid syntax.
+                  from:
+                    type: string
+                    description: If not specified, default value will be used.
+                  conditions:
+                    type: string
+                    description: After validation has to return boolean value.
+                  mailer_name:
+                    required: true
+                    type: string
+                    description: Has to be previously created mailer.
+                  absolute_delay_in_days:
+                    required: true
+                    type: integer
+                    description: Specified amount of time after starting the sequence when mailing is delivered. E.g 0.25
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              sequenceMailing:
+                $ref: '#/definitions/SequenceMailing'
+        '404':
+          description: MailyHerald::Sequence not found.
+        '422':
+          description: Validation failed.
+          schema:
+            properties:
+              errors:
+                type: object
+                properties:
+                  name:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  title:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  subject:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                  template:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  conditions:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - notBoolean
+                  mailerName:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  absoluteDelay:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
 definitions:
   List:
     type: object
