@@ -2372,6 +2372,39 @@ definitions:
       - subject
       - template
       - absoluteDelayInDays
+  Log:
+    type: object
+    description: Serialized MailyHerald::Log object.
+    properties:
+      id:
+        type: integer
+        description: Log's ID.
+      mailingId:
+        type: integer
+        description: ID of an associated mailing object.
+      entityId:
+        type: integer
+        description: ID of an associated entity object.
+      entityType:
+        type: string
+        description: Associated entity object's type, e.g. User.
+      entityEmail:
+        type: string
+        description: Associated entity object's email.
+      status:
+        type: string
+        described: >-
+          One of following:
+            - scheduled
+            - delivered
+            - skipped
+            - error
+      data:
+        type: object
+        description: Various data.
+      processingAt:
+        type: string
+        description: Delivery processing date-time.
   MailPreview:
     type: object
     description: Serialized Mail::Message object.

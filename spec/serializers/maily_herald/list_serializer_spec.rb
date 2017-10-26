@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe MailyHerald::ListSerializer do
 
-  describe "serializing MailyHerald::ListSerializer object" do
+  describe "serializing MailyHerald::List object" do
     let!(:list) { MailyHerald.list :generic_list }
 
     context "with active subscription, opt-out and potential subscriber" do

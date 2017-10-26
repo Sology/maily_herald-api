@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe MailyHerald::SubscriptionSerializer do
 
-  describe "serializing MailyHerald::ListSerializer object" do
+  describe "serializing MailyHerald::Subscription object" do
     let!(:list)     { MailyHerald.list :generic_list }
     let!(:entity)   { create :user }
 
