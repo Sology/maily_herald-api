@@ -6,7 +6,8 @@ module MailyHerald
         before_action :load_resources,  only:    :index
 
         def index
-          @items = @items.search_by(params[:query]) if @items.respond_to?(:search_by) && params[:query].present?
+          @items = @items.search_by(params[:query])  if  @items.respond_to?(:search_by)   &&  params[:query].present?
+          @items = @items.like_email(params[:query]) if  @items.respond_to?(:like_email)  &&  params[:query].present?
 
           if block_given?
             @items = yield(@items)

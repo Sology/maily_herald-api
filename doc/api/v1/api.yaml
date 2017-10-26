@@ -2045,6 +2045,76 @@ paths:
                 $ref: '#/definitions/MailPreview'
         '404':
           description: MailyHerald::Sequence, MailyHerald::SequenceMailing or entity not found.
+  /logs:
+    get:
+      operationId: get_logs
+      description: Get all logs.
+      summary: >-
+        Get all logs. Note: if you specify 'entity_id', you must specify 'entity_type' also!
+      tags:
+        - logs
+      parameters:
+        - name: log
+          in: body
+          description: >-
+            Allowed parameters:
+              - per
+              - page
+              - query
+              - status
+              - mailing_id
+              - entity_id
+              - entity_type
+          required: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: integer
+                default: 1
+                description: Page number
+              per:
+                type: integer
+                default: 10
+                description: Number of logs returned per page
+              query:
+                type: string
+                description: Filters logs by entity emails.
+              state:
+                type: string
+                description: >-
+                  When not specified all objects are returned regardless their state. Allowed states:
+                    - delivered
+                    - skipped
+                    - not_skipped
+                    - error
+                    - scheduled
+                    - processed
+              mailing_id:
+                type: integer
+                description: Any valid mailing ID.
+              entity_id:
+                type: integer
+                description: >-
+                  Any valid entity ID. When specified, 'entity_type' is required, otherwise it will be omitted.
+              entity_type:
+                type: string
+                description: >-
+                  When entity is an object of 'User' class - just specify 'user'. When specified, 'entity_id' is required, otherwise it will be omitted.
+      responses:
+        '200':
+          description: Operation successful
+          schema:
+            properties:
+              meta:
+                $ref: '#/definitions/Meta'
+              logs:
+                type: array
+                description: Collection of serialized MailyHerald::Log objects
+                items:
+                  $ref: '#/definitions/Log'
+        '404':
+          description: Mailing or entity not found.
 definitions:
   List:
     type: object
