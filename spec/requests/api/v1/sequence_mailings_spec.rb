@@ -116,4 +116,57 @@ describe "SequenceMailings API" do
     end
   end
 
+  describe "GET #show" do
+    let!(:sequence) { create :newsletters }
+    let!(:mailing) { sequence.mailings.first }
+
+    it { expect(MailyHerald::Sequence.count).to eq(1) }
+    it { expect(MailyHerald::SequenceMailing.count).to eq(3) }
+
+    context "with incorrect Sequence ID" do
+      before { send_request :get, "/maily_herald/api/v1/sequences/0/mailings/#{mailing.id}" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct Sequence ID" do
+      context "with incorrect SequenceMailing ID" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/0" }
+
+        it { expect(response.status).to eq(404) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["error"]).to eq("notFound") }
+      end
+
+      context "with correct SequenceMailing ID" do
+        before { send_request :get, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["sequenceMailing"]).to eq(
+              {
+                "id"                   =>  mailing.id,
+                "sequenceId"           =>  sequence.id,
+                "name"                 =>  mailing.name,
+                "title"                =>  mailing.title,
+                "subject"              =>  mailing.subject,
+                "template"             =>  mailing.template,
+                "conditions"           =>  mailing.conditions,
+                "from"                 =>  mailing.from,
+                "state"                =>  mailing.state.to_s,
+                "mailerName"           =>  mailing.mailer_name.to_s,
+                "locked"               =>  mailing.locked?,
+                "absoluteDelayInDays"  =>  mailing.absolute_delay_in_days
+             }
+           )
+          }
+      end
+    end
+  end
+
 end

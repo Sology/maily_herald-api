@@ -21,7 +21,7 @@ MailyHerald::Engine.routes.draw do
         res = r.to_sym
         resources res, except: [:new, :edit] do
           if res == :sequences
-            resources "sequence_mailings", as: "mailings", path: "mailings", only: :create
+            resources "sequence_mailings", as: "mailings", path: "mailings", only: [:create, :show]
           else
             member do
               get  "preview/:entity_id" => :preview

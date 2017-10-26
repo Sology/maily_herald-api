@@ -1788,6 +1788,35 @@ paths:
                       type: string
                       enum:
                         - blank
+  '/sequences/{sequence_id}/mailings/{id}':
+    get:
+      operationId: get_sequence
+      description: Get sequence mailing.
+      summary: Get sequence mailing.
+      tags:
+        - sequenceMailings
+      parameters:
+        - name: sequence_id
+          in: path
+          description: ID of a MailyHerald::Sequence.
+          required: true
+          type: integer
+          format: int64
+        - name: id
+          in: path
+          description: ID of a MailyHerald::SequenceMailing.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              sequenceMailing:
+                $ref: '#/definitions/SequenceMailing'
+        '404':
+          description: MailyHerald::Sequence or MailyHerald::SequenceMailing not found.
 definitions:
   List:
     type: object
