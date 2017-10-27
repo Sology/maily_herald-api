@@ -438,4 +438,118 @@ describe "Lists API" do
     end
   end
 
+  describe "GET #subscribers" do
+    let(:list)    { MailyHerald.list :generic_list }
+    let(:entity)  { create :user }
+
+    context "with incorrect MailyHerald::List ID" do
+      before { send_request :get, "/maily_herald/api/v1/lists/0/subscribers" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct MailyHerald::List ID" do
+      context "without subscribers" do
+        before { send_request :get, "/maily_herald/api/v1/lists/#{list.id}/subscribers" }
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["subscribers"]).to be_kind_of(Array) }
+        it { expect(response_json["subscribers"].count).to eq(0) }
+      end
+
+      context "with subscribers" do
+        before do
+          list.subscribe!(entity) && list.reload
+          send_request :get, "/maily_herald/api/v1/lists/#{list.id}/subscribers"
+        end
+
+        it { expect(response.status).to eq(200) }
+        it { expect(response).to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["subscribers"]).to be_kind_of(Array) }
+        it { expect(response_json["subscribers"].count).to eq(1) }
+        it { expect(response_json["subscribers"].first["id"]).to eq(entity.id) }
+        it { expect(response_json["subscribers"].first["email"]).to eq(entity.email) }
+      end
+    end
+  end
+
+  describe "GET #opt_outs" do
+    let(:list)         { MailyHerald.list :generic_list }
+    let!(:subscriber)  { create :user }
+    let!(:opt_out)     { create :user }
+
+    before do
+      list.subscribe!(subscriber)
+      list.subscribe!(opt_out)
+      list.unsubscribe!(opt_out)
+      list.reload
+    end
+
+    context "setup" do
+      it { expect(list.subscribers).to include(subscriber) }
+      it { expect(list.opt_outs).to include(opt_out) }
+    end
+
+    context "with incorrect MailyHerald::List ID" do
+      before { send_request :get, "/maily_herald/api/v1/lists/0/opt_outs" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct MailyHerald::List ID" do
+      before { send_request :get, "/maily_herald/api/v1/lists/#{list.id}/opt_outs" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["optOuts"]).to be_kind_of(Array) }
+      it { expect(response_json["optOuts"].count).to eq(1) }
+      it { expect(response_json["optOuts"].first["id"]).to eq(opt_out.id) }
+      it { expect(response_json["optOuts"].first["email"]).to eq(opt_out.email) }
+    end
+  end
+
+  describe "GET #potential_subscribers" do
+    let(:list)                   { MailyHerald.list :generic_list }
+    let!(:subscriber)            { create :user }
+    let!(:potential_subscriber)  { create :user }
+
+    before { list.subscribe!(subscriber) && list.reload }
+
+    context "setup" do
+      it { expect(list.subscribers).to include(subscriber) }
+      it { expect(list.potential_subscribers).to include(potential_subscriber) }
+    end
+
+    context "with incorrect MailyHerald::List ID" do
+      before { send_request :get, "/maily_herald/api/v1/lists/0/potential_subscribers" }
+
+      it { expect(response.status).to eq(404) }
+      it { expect(response).not_to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["error"]).to eq("notFound") }
+    end
+
+    context "with correct MailyHerald::List ID" do
+      before { send_request :get, "/maily_herald/api/v1/lists/#{list.id}/potential_subscribers" }
+
+      it { expect(response.status).to eq(200) }
+      it { expect(response).to be_success }
+      it { expect(response_json).not_to be_empty }
+      it { expect(response_json["potentialSubscribers"]).to be_kind_of(Array) }
+      it { expect(response_json["potentialSubscribers"].count).to eq(1) }
+      it { expect(response_json["potentialSubscribers"].first["id"]).to eq(potential_subscriber.id) }
+      it { expect(response_json["potentialSubscribers"].first["email"]).to eq(potential_subscriber.email) }
+    end
+  end
+
 end

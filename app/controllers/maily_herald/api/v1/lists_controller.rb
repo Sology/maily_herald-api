@@ -14,6 +14,15 @@ module MailyHerald
           render_subscription
         end
 
+        %w(subscribers opt_outs potential_subscribers).each do |name|
+          define_method(name) do
+            entities = @item.send(name)
+            outcome = []
+            entities.each {|e| outcome << build_serialized_entity(e)} if entities.any?
+            render_api({name.camelize(:lower) => outcome})
+          end
+        end
+
         private
 
         def load_entity
@@ -34,6 +43,13 @@ module MailyHerald
 
         def render_subscription
           render_api @subscription, root: 'subscription'
+        end
+
+        def build_serialized_entity entity
+          {
+            id: entity.id,
+            email: entity.try(:email)
+          }
         end
       end
     end

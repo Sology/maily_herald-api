@@ -312,6 +312,84 @@ paths:
                 $ref: '#/definitions/Subscription'
         '404':
           description: List or entity not found.
+  '/lists/{id}/subscribers':
+    get:
+      operationId: get_list_subscribers
+      description: Get list subscribers - all with active subscriptions.
+      summary: Get list subscribers.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::List.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              subscribers:
+                type: array
+                description: Collection of serialized entity objects
+                items:
+                  $ref: '#/definitions/Entity'
+        '404':
+          description: List not found.
+  '/lists/{id}/opt_outs':
+    get:
+      operationId: get_list_opt_outs
+      description: Get list opt-outs - all with inactive subscriptions.
+      summary: Get list opt-outs.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::List.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              optOuts:
+                type: array
+                description: Collection of serialized entity objects
+                items:
+                  $ref: '#/definitions/Entity'
+        '404':
+          description: List not found.
+  '/lists/{id}/potential_subscribers':
+    get:
+      operationId: get_list_potential_subscribers
+      description: Get list potential subscribers - all without subscriptions.
+      summary: Get list potential subscribers.
+      tags:
+        - lists
+      parameters:
+        - name: id
+          in: path
+          description: ID of a MailyHerald::List.
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            properties:
+              potentialSubscribers:
+                type: array
+                description: Collection of serialized entity objects
+                items:
+                  $ref: '#/definitions/Entity'
+        '404':
+          description: List not found.
   /contexts:
     get:
       operationId: get_contexts
@@ -2175,6 +2253,16 @@ definitions:
     required:
       - entityId
       - listId
+  Entity:
+    type: object
+    description: Serialized entity object
+    properties:
+      id:
+        type: integer
+        description: Entity's ID.
+      email:
+        type: string
+        description: Entity's email.
   Context:
     type: object
     description: Serialized MailyHerald::Context object

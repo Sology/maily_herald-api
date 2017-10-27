@@ -6,6 +6,9 @@ MailyHerald::Engine.routes.draw do
         member do
           post "subscribe/:entity_id"   => :subscribe
           post "unsubscribe/:entity_id" => :unsubscribe
+          get :subscribers
+          get :opt_outs
+          get :potential_subscribers
         end
 
         resources :subscriptions, only: :index, controller: 'lists/subscriptions'
