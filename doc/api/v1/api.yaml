@@ -1323,6 +1323,7 @@ paths:
                       enum:
                         - blank
                         - greaterThan0
+                        - notANumber
   '/periodical_mailings/{id}':
     get:
       operationId: get_periodical_mailing
@@ -1466,6 +1467,7 @@ paths:
                       type: string
                       enum:
                         - greaterThan0
+                        - notANumber
     delete:
       operationId: archive_periodical_mailing
       description: >-
@@ -1921,6 +1923,7 @@ paths:
                       type: string
                       enum:
                         - blank
+                        - notANumber
   '/sequences/{sequence_id}/mailings/{id}':
     get:
       operationId: get_sequence_mailing
@@ -2059,6 +2062,12 @@ paths:
                       type: string
                       enum:
                         - invalid
+                  absoluteDelay:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - notANumber
     delete:
       operationId: archive_sequence_mailing
       description: >-
