@@ -22,7 +22,7 @@ describe MailyHerald::PeriodicalMailingSerializer do
         template:      periodical_mailing.template,
         title:         periodical_mailing.title,
         startAt:       periodical_mailing.start_at.as_json,
-        periodInDays:  periodical_mailing.period_in_days, 
+        period:        periodical_mailing.period, 
         locked:        false
       })
     end

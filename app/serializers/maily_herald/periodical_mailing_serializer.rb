@@ -1,13 +1,9 @@
 module MailyHerald
   class PeriodicalMailingSerializer < MailingSerializer
-    attributes :startAt, :periodInDays
+    attributes :startAt, :period
 
     def startAt
       object.start_at
-    end
-
-    def periodInDays
-      object.period_in_days
     end
   end
 end

@@ -65,7 +65,7 @@ describe MailyHerald::SequenceSerializer do
                                   state:                mailing1.state,
                                   mailerName:           mailing1.mailer_name,
                                   locked:               false,
-                                  absoluteDelayInDays:  mailing1.absolute_delay_in_days
+                                  absoluteDelay:        mailing1.absolute_delay
                                 },
                                 {
                                   id:                   mailing2.id,
@@ -79,7 +79,7 @@ describe MailyHerald::SequenceSerializer do
                                   state:                mailing2.state,
                                   mailerName:           mailing2.mailer_name,
                                   locked:               false,
-                                  absoluteDelayInDays:  mailing2.absolute_delay_in_days
+                                  absoluteDelay:        mailing2.absolute_delay
                                 },
                                 {
                                   id:                   mailing3.id,
@@ -93,7 +93,7 @@ describe MailyHerald::SequenceSerializer do
                                   state:                mailing3.state,
                                   mailerName:           mailing3.mailer_name,
                                   locked:               false,
-                                  absoluteDelayInDays:  mailing3.absolute_delay_in_days
+                                  absoluteDelay:        mailing3.absolute_delay
                                 }
                               ]
         })

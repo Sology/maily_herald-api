@@ -1,6 +1,6 @@
 module MailyHerald
   class SequenceMailingSerializer < ActiveModel::Serializer
-    attributes :id, :sequenceId, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked, :absoluteDelayInDays
+    attributes :id, :sequenceId, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked, :absoluteDelay
 
     def sequenceId
       object.sequence_id
@@ -14,8 +14,8 @@ module MailyHerald
       object.locked?
     end
 
-    def absoluteDelayInDays
-      object.absolute_delay_in_days
+    def absoluteDelay
+      object.absolute_delay
     end
   end
 end

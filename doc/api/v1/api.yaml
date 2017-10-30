@@ -1248,10 +1248,10 @@ paths:
                     type: string
                     description: >-
                       Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
-                  period_in_days:
+                  period:
                     required: true
                     type: integer
-                    description: Amount of time between consecutive mailing deliveries.
+                    description: Amount of time between consecutive mailing deliveries (in seconds).
       responses:
         '200':
           description: Success
@@ -1392,9 +1392,9 @@ paths:
                   start_at:
                     type: string
                     description: Periodical mailing's new start_at.
-                  period_in_days:
+                  period:
                     type: integer
-                    description: Amount of time between consecutive mailing deliveries.
+                    description: Amount of time between consecutive mailing deliveries (in seconds).
                   state:
                     type: string
                     description: >-
@@ -1858,10 +1858,10 @@ paths:
                     required: true
                     type: string
                     description: Has to be previously created mailer.
-                  absolute_delay_in_days:
+                  absolute_delay:
                     required: true
                     type: integer
-                    description: Specified amount of time after starting the sequence when mailing is delivered. E.g 0.25
+                    description: Specified amount of time after starting the sequence when mailing is delivered (in seconds).
       responses:
         '200':
           description: Success
@@ -1996,9 +1996,9 @@ paths:
                   mailer_name:
                     type: string
                     description: Has to be previously created mailer.
-                  absolute_delay_in_days:
+                  absolute_delay:
                     type: integer
-                    description: New amount of time after starting the sequence when mailing is delivered.
+                    description: New amount of time after starting the sequence when mailing is delivered (in seconds).
                   state:
                     type: string
                     description: >-
@@ -2436,9 +2436,9 @@ definitions:
       startAt:
         type: string
         description: PeriodicalMailing's delivery start time. E.g. 2017-10-24T11:11:55.526+02:00
-      periodInDays:
-        type: string
-        description: PeriodicalMailing's delivery period in days. E.g. 7.00
+      period:
+        type: integer
+        description: PeriodicalMailing's delivery period in seconds.
     required:
       - name
       - title
@@ -2446,7 +2446,7 @@ definitions:
       - template
       - listId
       - startAt
-      - periodInDays
+      - period
   Sequence:
     type: object
     description: Serialized MailyHerald::Sequence object.
@@ -2520,16 +2520,16 @@ definitions:
       locked:
         type: boolean
         description: Indicates whether sequence mailing is locked or not.
-      absoluteDelayInDays:
+      absoluteDelay:
         type: string
-        description: Specified amount of time after starting the sequence when mailing is delivered. E.g 0.25
+        description: Specified amount of time after starting the sequence when mailing is delivered in seconds.
     required:
       - sequenceId
       - name
       - title
       - subject
       - template
-      - absoluteDelayInDays
+      - absoluteDelay
   Log:
     type: object
     description: Serialized MailyHerald::Log object.

@@ -17,7 +17,7 @@ module MailyHerald
         end
 
         def item_params
-          params.require(:sequence_mailing).permit(:title, :mailer_name, :from, :conditions, :subject, :template, :absolute_delay_in_days)
+          params.require(:sequence_mailing).permit(:title, :mailer_name, :from, :conditions, :subject, :template, :absolute_delay)
         end
       end
     end

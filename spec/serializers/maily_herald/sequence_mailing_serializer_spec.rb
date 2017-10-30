@@ -24,7 +24,7 @@ describe MailyHerald::SequenceMailingSerializer do
         template:             sequence_mailing.template,
         title:                sequence_mailing.title,
         locked:               false,
-        absoluteDelayInDays:  sequence_mailing.absolute_delay_in_days
+        absoluteDelay:        sequence_mailing.absolute_delay
       })
     end
   end

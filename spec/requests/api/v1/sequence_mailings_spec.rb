@@ -220,7 +220,7 @@ describe "SequenceMailings API" do
                 "state"                =>  mailing.state.to_s,
                 "mailerName"           =>  mailing.mailer_name.to_s,
                 "locked"               =>  mailing.locked?,
-                "absoluteDelayInDays"  =>  mailing.absolute_delay_in_days
+                "absoluteDelay"        =>  mailing.absolute_delay
              }
            )
           }
@@ -235,7 +235,7 @@ describe "SequenceMailings API" do
     it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
 
     context "with incorrect sequence ID" do
-      before { send_request :post, "/maily_herald/api/v1/sequences/0/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+      before { send_request :post, "/maily_herald/api/v1/sequences/0/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay: 3600}}.to_json }
 
       it { expect(response.status).to eq(404) }
       it { expect(response).not_to be_success }
@@ -246,7 +246,7 @@ describe "SequenceMailings API" do
 
     context "with correct sequence ID" do
       context "with correct params" do
-        before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay: 3600}}.to_json }
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
@@ -264,12 +264,12 @@ describe "SequenceMailings API" do
         it { expect(response_json["sequenceMailing"]["conditions"]).to be_nil }
         it { expect(response_json["sequenceMailing"]["from"]).to be_nil }
         it { expect(response_json["sequenceMailing"]["locked"]).to be_falsy }
-        it { expect(response_json["sequenceMailing"]["absoluteDelayInDays"]).to eq("0.04") }
+        it { expect(response_json["sequenceMailing"]["absoluteDelay"]).to eq(3600) }
       end
 
       context "with incorrect params" do
         context "not setup mailer" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {mailer_name: "wrongOne", title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {mailer_name: "wrongOne", title: "New sequenceMailing", subject: "New Subject", template: "Hello!", absolute_delay: 3600}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
@@ -279,7 +279,7 @@ describe "SequenceMailings API" do
         end
 
         context "wrong template" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {mailer_name: "wrongOne", title: "New sequenceMailing", subject: "New Subject", template: "{{", absolute_delay_in_days: 0.04}}.to_json }
+          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {mailer_name: "wrongOne", title: "New sequenceMailing", subject: "New Subject", template: "{{", absolute_delay: 3600}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
@@ -289,7 +289,7 @@ describe "SequenceMailings API" do
         end
 
         context "wrong conditions" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", conditions: "{{", absolute_delay_in_days: 0.04}}.to_json }
+          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!", conditions: "{{", absolute_delay: 3600}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
@@ -299,7 +299,7 @@ describe "SequenceMailings API" do
         end
 
         context "nil title" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {subject: "New Subject", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {subject: "New Subject", template: "Hello!", absolute_delay: 3600}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
@@ -310,7 +310,7 @@ describe "SequenceMailings API" do
         end
 
         context "nil subject when generic mailer" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", template: "Hello!", absolute_delay_in_days: 0.04}}.to_json }
+          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", template: "Hello!", absolute_delay: 3600}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
@@ -320,7 +320,7 @@ describe "SequenceMailings API" do
         end
 
         context "nil template when generic mailer" do
-          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", absolute_delay_in_days: 0.04}}.to_json }
+          before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", absolute_delay: 3600}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
@@ -329,7 +329,7 @@ describe "SequenceMailings API" do
           it { expect(MailyHerald::SequenceMailing.count).to eq(0) }
         end
 
-        context "nil absolute_delay_in_days" do
+        context "nil absolute_delay" do
           before { send_request :post, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings", {sequence_mailing: {title: "New sequenceMailing", subject: "New Subject", template: "Hello!"}}.to_json }
 
           it { expect(response.status).to eq(422) }
@@ -370,7 +370,7 @@ describe "SequenceMailings API" do
 
       context "with correct SequenceMailing ID" do
         context "with correct params" do
-          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {subject: "New Subject", template: "New Template", conditions: "active", state: "enabled", absolute_delay_in_days: 10}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {subject: "New Subject", template: "New Template", conditions: "active", state: "enabled", absolute_delay: 7200}}.to_json }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -379,7 +379,7 @@ describe "SequenceMailings API" do
           it { expect(response_json["sequenceMailing"]["template"]).to eq("New Template") }
           it { expect(response_json["sequenceMailing"]["state"]).to eq("enabled") }
           it { expect(response_json["sequenceMailing"]["conditions"]).to eq("active") }
-          it { expect(response_json["sequenceMailing"]["absoluteDelayInDays"]).to eq("10.00") }
+          it { expect(response_json["sequenceMailing"]["absoluteDelay"]).to eq(7200) }
           it { mailing.reload; expect(mailing.subject).to eq("New Subject") }
         end
 
