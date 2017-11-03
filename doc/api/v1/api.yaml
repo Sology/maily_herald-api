@@ -904,9 +904,9 @@ paths:
                   $ref: '#/definitions/OneTimeMailing'
     post:
       operationId: create_new_one_time_mailing
-      description: Create new one time mailing.
-      summary: >-
+      description: >-
         Create new one time mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
+      summary: Create new one time mailing.
       tags:
         - oneTimeMailings
       parameters:
@@ -1308,9 +1308,9 @@ paths:
                   $ref: '#/definitions/PeriodicalMailing'
     post:
       operationId: create_new_periodical_mailing
-      description: Create new periodical mailing.
-      summary: >-
+      description: >-
         Create new periodical mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
+      summary: Create new periodical mailing.
       tags:
         - periodicalMailings
       parameters:
@@ -1978,9 +1978,9 @@ paths:
           description: MailyHerald::Sequence not found.
     post:
       operationId: create_new_sequence_mailing
-      description: Create new sequence mailing.
-      summary: >-
+      description: >-
         Create new sequence mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
+      summary: Create new sequence mailing.
       tags:
         - sequenceMailings
       parameters:
@@ -2355,9 +2355,9 @@ paths:
   /logs:
     get:
       operationId: get_logs
-      description: Get all logs.
-      summary: >-
+      description: >-
         Get all logs. Note: if you specify 'entity_id', you must specify 'entity_type' also!
+      summary: Get all logs.
       tags:
         - logs
       parameters:

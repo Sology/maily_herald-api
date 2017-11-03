@@ -124,7 +124,7 @@
                 <tbody>
                     <tr>
                         <td><a href="#operation--logs-get">GET /logs</a></td>
-                        <td><p>Get all logs. Note: if you specify &#39;entity_id&#39;, you must specify &#39;entity_type&#39; also!</p>
+                        <td><p>Get all logs.</p>
         </td>
                     </tr>
                 </tbody>
@@ -269,7 +269,7 @@
                     </tr>
                     <tr>
                         <td><a href="#operation--one_time_mailings-post">POST /one_time_mailings</a></td>
-                        <td><p>Create new one time mailing. Note that &#39;subject&#39; and &#39;template&#39; are described as required parameters, but if you specify &#39;mailer_name&#39; different than default (&#39;generic_mailer&#39;) you don&#39;t have to set those parameters. Also, if you set &#39;kind&#39; to &#39;plain&#39;, you will have to provide only &#39;template_plain&#39; and we will parse it to HTML if necessary (same goes for html &#39;kind&#39;).</p>
+                        <td><p>Create new one time mailing.</p>
         </td>
                     </tr>
                     <tr>
@@ -308,7 +308,7 @@
                     </tr>
                     <tr>
                         <td><a href="#operation--periodical_mailings-post">POST /periodical_mailings</a></td>
-                        <td><p>Create new periodical mailing. Note that &#39;subject&#39; and &#39;template&#39; are described as required parameters, but if you specify &#39;mailer_name&#39; different than default (&#39;generic_mailer&#39;) you don&#39;t have to set those parameters. Also, if you set &#39;kind&#39; to &#39;plain&#39;, you will have to provide only &#39;template_plain&#39; and we will parse it to HTML if necessary (same goes for html &#39;kind&#39;).</p>
+                        <td><p>Create new periodical mailing.</p>
         </td>
                     </tr>
                     <tr>
@@ -386,7 +386,7 @@
                     </tr>
                     <tr>
                         <td><a href="#operation--sequences--sequence_id--mailings-post">POST /sequences/{sequence_id}/mailings</a></td>
-                        <td><p>Create new sequence mailing. Note that &#39;subject&#39; and &#39;template&#39; are described as required parameters, but if you specify &#39;mailer_name&#39; different than default (&#39;generic_mailer&#39;) you don&#39;t have to set those parameters. Also, if you set &#39;kind&#39; to &#39;plain&#39;, you will have to provide only &#39;template_plain&#39; and we will parse it to HTML if necessary (same goes for html &#39;kind&#39;).</p>
+                        <td><p>Create new sequence mailing.</p>
         </td>
                     </tr>
                     <tr>
@@ -4102,14 +4102,14 @@
         <span id="path--logs"></span>
             <div id="operation--logs-get" class="swagger--panel-operation-get panel">
                 <div class="panel-heading">
-                    <div class="operation-summary">Get all logs. Note: if you specify &apos;entity_id&apos;, you must specify &apos;entity_type&apos; also!</div>
+                    <div class="operation-summary">Get all logs.</div>
                     <h3 class="panel-title"><span class="operation-name">GET</span> <strong>/logs</strong></h3>
                         Tags:
                             <a href="#tag-logs">logs</a>
                 </div>
                 <div class="panel-body">
                     <section class="sw-operation-description">
-                        <p>Get all logs.</p>
+                        <p>Get all logs. Note: if you specify &#39;entity_id&#39;, you must specify &#39;entity_type&#39; also!</p>
             
                     </section>
             
@@ -4514,14 +4514,14 @@
             </div>
             <div id="operation--one_time_mailings-post" class="swagger--panel-operation-post panel">
                 <div class="panel-heading">
-                    <div class="operation-summary">Create new one time mailing. Note that &apos;subject&apos; and &apos;template&apos; are described as required parameters, but if you specify &apos;mailer_name&apos; different than default (&apos;generic_mailer&apos;) you don&apos;t have to set those parameters. Also, if you set &apos;kind&apos; to &apos;plain&apos;, you will have to provide only &apos;template_plain&apos; and we will parse it to HTML if necessary (same goes for html &apos;kind&apos;).</div>
+                    <div class="operation-summary">Create new one time mailing.</div>
                     <h3 class="panel-title"><span class="operation-name">POST</span> <strong>/one_time_mailings</strong></h3>
                         Tags:
                             <a href="#tag-oneTimeMailings">oneTimeMailings</a>
                 </div>
                 <div class="panel-body">
                     <section class="sw-operation-description">
-                        <p>Create new one time mailing.</p>
+                        <p>Create new one time mailing. Note that &#39;subject&#39; and &#39;template&#39; are described as required parameters, but if you specify &#39;mailer_name&#39; different than default (&#39;generic_mailer&#39;) you don&#39;t have to set those parameters. Also, if you set &#39;kind&#39; to &#39;plain&#39;, you will have to provide only &#39;template_plain&#39; and we will parse it to HTML if necessary (same goes for html &#39;kind&#39;).</p>
             
                     </section>
             
@@ -6182,14 +6182,14 @@
             </div>
             <div id="operation--periodical_mailings-post" class="swagger--panel-operation-post panel">
                 <div class="panel-heading">
-                    <div class="operation-summary">Create new periodical mailing. Note that &apos;subject&apos; and &apos;template&apos; are described as required parameters, but if you specify &apos;mailer_name&apos; different than default (&apos;generic_mailer&apos;) you don&apos;t have to set those parameters. Also, if you set &apos;kind&apos; to &apos;plain&apos;, you will have to provide only &apos;template_plain&apos; and we will parse it to HTML if necessary (same goes for html &apos;kind&apos;).</div>
+                    <div class="operation-summary">Create new periodical mailing.</div>
                     <h3 class="panel-title"><span class="operation-name">POST</span> <strong>/periodical_mailings</strong></h3>
                         Tags:
                             <a href="#tag-periodicalMailings">periodicalMailings</a>
                 </div>
                 <div class="panel-body">
                     <section class="sw-operation-description">
-                        <p>Create new periodical mailing.</p>
+                        <p>Create new periodical mailing. Note that &#39;subject&#39; and &#39;template&#39; are described as required parameters, but if you specify &#39;mailer_name&#39; different than default (&#39;generic_mailer&#39;) you don&#39;t have to set those parameters. Also, if you set &#39;kind&#39; to &#39;plain&#39;, you will have to provide only &#39;template_plain&#39; and we will parse it to HTML if necessary (same goes for html &#39;kind&#39;).</p>
             
                     </section>
             
@@ -8973,14 +8973,14 @@
             </div>
             <div id="operation--sequences--sequence_id--mailings-post" class="swagger--panel-operation-post panel">
                 <div class="panel-heading">
-                    <div class="operation-summary">Create new sequence mailing. Note that &apos;subject&apos; and &apos;template&apos; are described as required parameters, but if you specify &apos;mailer_name&apos; different than default (&apos;generic_mailer&apos;) you don&apos;t have to set those parameters. Also, if you set &apos;kind&apos; to &apos;plain&apos;, you will have to provide only &apos;template_plain&apos; and we will parse it to HTML if necessary (same goes for html &apos;kind&apos;).</div>
+                    <div class="operation-summary">Create new sequence mailing.</div>
                     <h3 class="panel-title"><span class="operation-name">POST</span> <strong>/sequences/{sequence_id}/mailings</strong></h3>
                         Tags:
                             <a href="#tag-sequenceMailings">sequenceMailings</a>
                 </div>
                 <div class="panel-body">
                     <section class="sw-operation-description">
-                        <p>Create new sequence mailing.</p>
+                        <p>Create new sequence mailing. Note that &#39;subject&#39; and &#39;template&#39; are described as required parameters, but if you specify &#39;mailer_name&#39; different than default (&#39;generic_mailer&#39;) you don&#39;t have to set those parameters. Also, if you set &#39;kind&#39; to &#39;plain&#39;, you will have to provide only &#39;template_plain&#39; and we will parse it to HTML if necessary (same goes for html &#39;kind&#39;).</p>
             
                     </section>
             
