@@ -186,10 +186,14 @@ describe "AdHocMailings API" do
             {
               "id"          =>  mailing.id,
               "listId"      =>  list.id,
+              "kind"        =>  mailing.kind,
               "name"        =>  "ad_hoc_mail",
               "title"       =>  "Ad hoc mailing",
               "subject"     =>  "Hello!",
-              "template"    =>  "hello",
+              "template"    =>  {
+                                  "html"  => mailing.template_plain,
+                                  "plain" => mailing.template_plain
+                                },
               "conditions"  =>  nil,
               "from"        =>  nil,
               "state"       =>  "enabled",
@@ -205,7 +209,7 @@ describe "AdHocMailings API" do
     it { expect(MailyHerald::AdHocMailing.count).to eq(0) }
 
     context "with correct params" do
-      before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {title: "New adHocMailing", list: "generic_list", subject: "New Subject", template: "Hello!"}}.to_json }
+      before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {kind: "plain", title: "New adHocMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", template_html: "Bye!"}}.to_json }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -213,10 +217,11 @@ describe "AdHocMailings API" do
       it { expect(MailyHerald::AdHocMailing.count).to eq(1) }
       it { expect(response_json["adHocMailing"]["id"]).to eq(MailyHerald::AdHocMailing.first.id) }
       it { expect(response_json["adHocMailing"]["listId"]).to eq(list.id) }
+      it { expect(response_json["adHocMailing"]["kind"]).to eq("plain") }
       it { expect(response_json["adHocMailing"]["name"]).to eq("new_adhocmailing") }
       it { expect(response_json["adHocMailing"]["title"]).to eq("New adHocMailing") }
       it { expect(response_json["adHocMailing"]["subject"]).to eq("New Subject") }
-      it { expect(response_json["adHocMailing"]["template"]).to eq("Hello!") }
+      it { expect(response_json["adHocMailing"]["template"]).to eq({"html" => "Hello!", "plain" => "Hello!"}) }
       it { expect(response_json["adHocMailing"]["state"]).to eq("disabled") }
       it { expect(response_json["adHocMailing"]["mailerName"]).to eq("generic") }
       it { expect(response_json["adHocMailing"]["conditions"]).to be_nil }
@@ -226,7 +231,7 @@ describe "AdHocMailings API" do
 
     context "with incorrect params" do
       context "not setup mailer" do
-        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {mailer_name: "wrongOne", title: "New adHocMailing", list: "generic_list", subject: "New Subject", template: "Hello!"}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {mailer_name: "wrongOne", title: "New adHocMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!"}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -236,12 +241,22 @@ describe "AdHocMailings API" do
       end
 
       context "wrong template" do
-        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {title: "New adHocMailing", list: "generic_list", subject: "New Subject", template: "Hello {{ world!"}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {title: "New adHocMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello {{ world!"}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
         it { expect(response_json).not_to be_empty }
-        it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+        it { expect(response_json["errors"]["templatePlain"]).to eq("syntaxError") }
+        it { expect(MailyHerald::AdHocMailing.count).to eq(0) }
+      end
+
+      context "wrong kind" do
+        before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {kind: "wrong", title: "New adHocMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!"}}.to_json }
+
+        it { expect(response.status).to eq(422) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["errors"]["kind"]).to eq("invalid") }
         it { expect(MailyHerald::AdHocMailing.count).to eq(0) }
       end
 
@@ -286,13 +301,14 @@ describe "AdHocMailings API" do
         it { expect(MailyHerald::AdHocMailing.count).to eq(0) }
       end
 
-      context "nil template when generic mailer" do
+      context "nil template_plain when generic mailer" do
         before { send_request :post, "/maily_herald/api/v1/ad_hoc_mailings", {ad_hoc_mailing: {title: "New adHocMailing", list: "generic_list", subject: "New Subject"}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
         it { expect(response_json).not_to be_empty }
-        it { expect(response_json["errors"]["template"]).to eq("blank") }
+        it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+        it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
         it { expect(MailyHerald::AdHocMailing.count).to eq(0) }
       end
     end
@@ -314,13 +330,13 @@ describe "AdHocMailings API" do
 
     context "with correct AdHocMailing ID" do
       context "with correct params" do
-        before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {subject: "New Subject", template: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
+        before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
         it { expect(response_json).not_to be_empty }
         it { expect(response_json["adHocMailing"]["subject"]).to eq("New Subject") }
-        it { expect(response_json["adHocMailing"]["template"]).to eq("New Template") }
+        it { expect(response_json["adHocMailing"]["template"]).to eq({"html" => "New Template", "plain" => "New Template"}) }
         it { expect(response_json["adHocMailing"]["state"]).to eq("enabled") }
         it { expect(response_json["adHocMailing"]["mailerName"]).to eq("generic") }
         it { expect(response_json["adHocMailing"]["conditions"]).to eq("active") }
@@ -338,13 +354,22 @@ describe "AdHocMailings API" do
           it { expect(response_json["errors"]["list"]).to eq("blank") }
         end
 
-        context "wrong template" do
-          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {template: "{{"}}.to_json }
+        context "wrong kind" do
+          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {kind: "wrong"}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
           it { expect(response_json).not_to be_empty }
-          it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+          it { expect(response_json["errors"]["kind"]).to eq("invalid") }
+        end
+
+        context "wrong template_plain" do
+          before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {template_plain: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("syntaxError") }
         end
 
         context "wrong conditions" do

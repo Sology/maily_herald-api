@@ -56,10 +56,14 @@ describe MailyHerald::SequenceSerializer do
                                 {
                                   id:                   mailing1.id,
                                   sequenceId:           sequence.id,
+                                  kind:                 mailing1.kind,
                                   name:                 mailing1.name,
                                   title:                mailing1.title,
                                   subject:              mailing1.subject,
-                                  template:             mailing1.template,
+                                  template:             {
+                                                          html:  mailing1.template_plain,
+                                                          plain: mailing1.template_plain
+                                                        },
                                   conditions:           mailing1.conditions,
                                   from:                 mailing1.from,
                                   state:                mailing1.state,
@@ -70,10 +74,14 @@ describe MailyHerald::SequenceSerializer do
                                 {
                                   id:                   mailing2.id,
                                   sequenceId:           sequence.id,
+                                  kind:                 mailing2.kind,
                                   name:                 mailing2.name,
                                   title:                mailing2.title,
                                   subject:              mailing2.subject,
-                                  template:             mailing2.template,
+                                  template:             {
+                                                          html:  mailing2.template_plain,
+                                                          plain: mailing2.template_plain
+                                                        },
                                   conditions:           mailing2.conditions,
                                   from:                 mailing2.from,
                                   state:                mailing2.state,
@@ -84,10 +92,14 @@ describe MailyHerald::SequenceSerializer do
                                 {
                                   id:                   mailing3.id,
                                   sequenceId:           sequence.id,
+                                  kind:                 mailing3.kind,
                                   name:                 mailing3.name,
                                   title:                mailing3.title,
                                   subject:              mailing3.subject,
-                                  template:             mailing3.template,
+                                  template:             {
+                                                          html:  mailing3.template_plain,
+                                                          plain: mailing3.template_plain
+                                                        },
                                   conditions:           mailing3.conditions,
                                   from:                 mailing3.from,
                                   state:                mailing3.state,

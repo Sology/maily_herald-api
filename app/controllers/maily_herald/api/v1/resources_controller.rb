@@ -62,6 +62,13 @@ module MailyHerald
           else
             render_error @item
           end
+
+        rescue ArgumentError => e
+          if e.to_s.match(/not\ a\ valid\ kind/)
+            render_error({kind: "invalid"})
+          else
+            render_error({base: "invalid"})
+          end
         end
       end
     end

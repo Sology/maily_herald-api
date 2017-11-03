@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171018174748) do
+ActiveRecord::Schema.define(version: 20171102123908) do
 
   create_table "maily_herald_dispatches", force: :cascade do |t|
     t.string "type", null: false
@@ -24,12 +24,13 @@ ActiveRecord::Schema.define(version: 20171018174748) do
     t.string "subject"
     t.string "from"
     t.string "state", default: "disabled"
-    t.text "template"
+    t.text "template_plain"
     t.integer "absolute_delay"
     t.integer "period"
-    t.boolean "override_subscription"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "kind", default: 0, null: false
+    t.text "template_html"
     t.index ["name"], name: "index_maily_herald_dispatches_on_name", unique: true
   end
 

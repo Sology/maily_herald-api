@@ -5,9 +5,9 @@ FactoryGirl.define do
     name "ad_hoc_mail"
     title "Ad hoc mailing"
     subject "Hello!"
-    template "hello"
+    template_plain "hello"
+    template_html nil
     state "enabled"
     list :generic_list
-    override_subscription false
   end
 end

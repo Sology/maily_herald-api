@@ -480,7 +480,7 @@ paths:
     post:
       operationId: create_new_ad_hoc_mailing
       description: >-
-        Create new ad hoc mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
+        Create new ad hoc mailing. Note that 'subject', 'template_plain' and 'template_html' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
       summary: Create new ad hoc mailing.
       tags:
         - adHocMailings
@@ -494,6 +494,14 @@ paths:
               ad_hoc_mailing:
                 type: object
                 properties:
+                  kind:
+                    required: true
+                    type: string
+                    description: >-
+                      Ad hoc mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     required: true
                     type: string
@@ -506,10 +514,14 @@ paths:
                     required: true
                     type: string
                     description: Ad hoc mailing's subject.
-                  template:
+                  template_plain:
                     required: true
                     type: string
-                    description: Ad hoc mailing's template. Will be validated against Liquid syntax.
+                    description: Ad hoc mailing's plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    required: true
+                    type: string
+                    description: Ad hoc mailing's HTML template.
                   list:
                     required: true
                     type: string
@@ -537,6 +549,18 @@ paths:
               errors:
                 type: object
                 properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   name:
                     type: array
                     items:
@@ -555,7 +579,14 @@ paths:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -625,15 +656,25 @@ paths:
               ad_hoc_mailing:
                 type: object
                 properties:
+                  kind:
+                    type: string
+                    description: >-
+                      Ad hoc mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     type: string
                     description: Ad hoc mailing's new title. Name will remain unchanged.
                   subject:
                     type: string
                     description: Ad hoc mailing's new subject.
-                  template:
+                  template_plain:
                     type: string
-                    description: Ad hoc mailing's new template. Will be validated against Liquid syntax.
+                    description: Ad hoc mailing's new plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    type: string
+                    description: Ad hoc mailing's new HTML template.
                   list:
                     type: string
                     description: Previously created MailyHerald::List object's name.
@@ -673,13 +714,27 @@ paths:
                       type: string
                       enum:
                         - locked
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   title:
                     type: array
                     items:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -851,7 +906,7 @@ paths:
       operationId: create_new_one_time_mailing
       description: Create new one time mailing.
       summary: >-
-        Create new one time mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
+        Create new one time mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
       tags:
         - oneTimeMailings
       parameters:
@@ -864,6 +919,14 @@ paths:
               one_time_mailing:
                 type: object
                 properties:
+                  kind:
+                    required: true
+                    type: string
+                    description: >-
+                      One time mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     required: true
                     type: string
@@ -876,10 +939,14 @@ paths:
                     required: true
                     type: string
                     description: One time mailing's subject.
-                  template:
+                  template_plain:
                     required: true
                     type: string
-                    description: One time mailing's template. Will be validated against Liquid syntax.
+                    description: One time mailing's plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    required: true
+                    type: string
+                    description: One time mailing's HTML template.
                   list:
                     required: true
                     type: string
@@ -913,6 +980,18 @@ paths:
               errors:
                 type: object
                 properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   name:
                     type: array
                     items:
@@ -931,7 +1010,14 @@ paths:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -1008,15 +1094,25 @@ paths:
               one_time_mailing:
                 type: object
                 properties:
+                  kind:
+                    type: string
+                    description: >-
+                      One time mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     type: string
                     description: One time mailing's new title. Name will remain unchanged.
                   subject:
                     type: string
                     description: One time mailing's new subject.
-                  template:
+                  template_plain:
                     type: string
-                    description: One time's new template. Will be validated against Liquid syntax.
+                    description: One time mailing's new plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    type: string
+                    description: One time mailing's new HTML template.
                   list:
                     type: string
                     description: Previously created MailyHerald::List object's name.
@@ -1059,13 +1155,27 @@ paths:
                       type: string
                       enum:
                         - locked
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   title:
                     type: array
                     items:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -1200,7 +1310,7 @@ paths:
       operationId: create_new_periodical_mailing
       description: Create new periodical mailing.
       summary: >-
-        Create new periodical mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
+        Create new periodical mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
       tags:
         - periodicalMailings
       parameters:
@@ -1213,6 +1323,14 @@ paths:
               periodical_mailing:
                 type: object
                 properties:
+                  kind:
+                    required: true
+                    type: string
+                    description: >-
+                      Ad hoc mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     required: true
                     type: string
@@ -1225,10 +1343,14 @@ paths:
                     required: true
                     type: string
                     description: Periodical mailing's subject.
-                  template:
+                  template_plain:
                     required: true
                     type: string
-                    description: Periodical mailing's template. Will be validated against Liquid syntax.
+                    description: Periodical mailing's plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    required: true
+                    type: string
+                    description: Periodical mailing's HTML template.
                   list:
                     required: true
                     type: string
@@ -1266,6 +1388,18 @@ paths:
               errors:
                 type: object
                 properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   name:
                     type: array
                     items:
@@ -1284,7 +1418,14 @@ paths:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -1369,15 +1510,25 @@ paths:
               periodical_mailing:
                 type: object
                 properties:
+                  kind:
+                    type: string
+                    description: >-
+                      Periodical mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     type: string
                     description: Periodical mailing's new title. Name will remain unchanged.
                   subject:
                     type: string
                     description: Periodical mailing's new subject.
-                  template:
+                  template_plain:
                     type: string
-                    description: Periodical's new template. Will be validated against Liquid syntax.
+                    description: Periodical mailing's new plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    type: string
+                    description: Periodical mailing's new HTML template.
                   list:
                     type: string
                     description: Previously created MailyHerald::List object's name.
@@ -1423,13 +1574,27 @@ paths:
                       type: string
                       enum:
                         - locked
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   title:
                     type: array
                     items:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -1815,7 +1980,7 @@ paths:
       operationId: create_new_sequence_mailing
       description: Create new sequence mailing.
       summary: >-
-        Create new sequence mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters.
+        Create new sequence mailing. Note that 'subject' and 'template' are described as required parameters, but if you specify 'mailer_name' different than default ('generic_mailer') you don't have to set those parameters. Also, if you set 'kind' to 'plain', you will have to provide only 'template_plain' and we will parse it to HTML if necessary (same goes for html 'kind').
       tags:
         - sequenceMailings
       parameters:
@@ -1834,6 +1999,14 @@ paths:
               sequence_mailing:
                 type: object
                 properties:
+                  kind:
+                    required: true
+                    type: string
+                    description: >-
+                      Sequence mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     required: true
                     type: string
@@ -1846,10 +2019,14 @@ paths:
                     required: true
                     type: string
                     description: Sequence mailing's subject.
-                  template:
+                  template_plain:
                     required: true
                     type: string
-                    description: Sequence mailing's template. Will be validated against Liquid syntax.
+                    description: Sequence mailing's plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    required: true
+                    type: string
+                    description: Sequence mailing's HTML template.
                   from:
                     type: string
                     description: If not specified, default value will be used.
@@ -1880,6 +2057,18 @@ paths:
               errors:
                 type: object
                 properties:
+                  base:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   name:
                     type: array
                     items:
@@ -1898,7 +2087,14 @@ paths:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -1981,15 +2177,25 @@ paths:
               sequence_mailing:
                 type: object
                 properties:
+                  kind:
+                    type: string
+                    description: >-
+                      Sequence mailing's new kind. One of following allowed:
+                        - both
+                        - html
+                        - plain
                   title:
                     type: string
                     description: Sequence mailing's new title. Name will remain unchanged.
                   subject:
                     type: string
                     description: Sequence mailing's new subject.
-                  template:
+                  template_plain:
                     type: string
-                    description: Sequence's new template. Will be validated against Liquid syntax.
+                    description: Sequence mailing's new plain text template. Will be validated against Liquid syntax.
+                  template_html:
+                    type: string
+                    description: Sequence mailing's new HTML template.
                   from:
                     type: string
                     description: If not specified, default value will be used.
@@ -2031,13 +2237,27 @@ paths:
                       type: string
                       enum:
                         - locked
+                        - invalid
+                  kind:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - invalid
                   title:
                     type: array
                     items:
                       type: string
                       enum:
                         - blank
-                  template:
+                  templatePlain:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - blank
+                        - syntaxError
+                  templateHtml:
                     type: array
                     items:
                       type: string
@@ -2319,6 +2539,13 @@ definitions:
       id:
         type: integer
         description: AdHocMailing's ID.
+      kind:
+        type: string
+        description: >-
+          AdHocMailing's email type. Can be only: (if not given, it defaults to 'both')
+            - both
+            - html
+            - plain
       name:
         type: string
         description: AdHocMailing's name based on title.
@@ -2332,8 +2559,16 @@ definitions:
         type: string
         description: AdHocMailing's subject.
       template:
-        type: string
-        description: AdHocMailing's template.
+        type: object
+        description: >-
+          AdHocMailing's templates preview. When 'kind' is set to 'html', then we parse given 'template_html' to 'template_plain' and vice versa.
+        properties:
+          html:
+            type: string
+            description: HTML email preview.
+          plain:
+            type: string
+            description: Email preview in plain text.
       mailerName:
         type: string
         description: AdHocMailing's mailer's name.
@@ -2363,6 +2598,13 @@ definitions:
       id:
         type: integer
         description: OneTimeMailing's ID.
+      kind:
+        type: string
+        description: >-
+          OneTimeMailing's email type. Can be only: (if not given, it defaults to 'both')
+            - both
+            - html
+            - plain
       name:
         type: string
         description: OneTimeMailing's name based on title.
@@ -2376,8 +2618,16 @@ definitions:
         type: string
         description: OneTimeMailing's subject.
       template:
-        type: string
-        description: OneTimeMailing's template.
+        type: object
+        description: >-
+          OneTimeMailing's templates preview. When 'kind' is set to 'html', then we parse given 'template_html' to 'template_plain' and vice versa.
+        properties:
+          html:
+            type: string
+            description: HTML email preview.
+          plain:
+            type: string
+            description: Email preview in plain text.
       mailerName:
         type: string
         description: OneTimeMailing's mailer's name.
@@ -2411,6 +2661,13 @@ definitions:
       id:
         type: integer
         description: PeriodicalMailing's ID.
+      kind:
+        type: string
+        description: >-
+          PeriodicalMailing's email type. Can be only: (if not given, it defaults to 'both')
+            - both
+            - html
+            - plain
       name:
         type: string
         description: PeriodicalMailing's name based on title.
@@ -2424,8 +2681,16 @@ definitions:
         type: string
         description: PeriodicalMailing's subject.
       template:
-        type: string
-        description: PeriodicalMailing's template.
+        type: object
+        description: >-
+          PeriodicalMailing's templates preview. When 'kind' is set to 'html', then we parse given 'template_html' to 'template_plain' and vice versa.
+        properties:
+          html:
+            type: string
+            description: HTML email preview.
+          plain:
+            type: string
+            description: Email preview in plain text.
       mailerName:
         type: string
         description: PeriodicalMailing's mailer's name.
@@ -2501,6 +2766,13 @@ definitions:
       sequenceId:
         type: integer
         description: ID of an associated MailyHerald::Sequence object.
+      kind:
+        type: string
+        description: >-
+          SequenceMailing's email type. Can be only: (if not given, it defaults to 'both')
+            - both
+            - html
+            - plain
       name:
         type: string
         description: SequenceMailing's name based on title.
@@ -2511,8 +2783,16 @@ definitions:
         type: string
         description: SequenceMailing's subject.
       template:
-        type: string
-        description: SequenceMailing's template.
+        type: object
+        description: >-
+          SequenceMailing's templates preview. When 'kind' is set to 'html', then we parse given 'template_html' to 'template_plain' and vice versa.
+        properties:
+          html:
+            type: string
+            description: HTML email preview.
+          plain:
+            type: string
+            description: Email preview in plain text.
       mailerName:
         type: string
         description: SequenceMailing's mailer's name.

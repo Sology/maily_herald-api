@@ -193,10 +193,14 @@ describe "OneTimeMailings API" do
             {
               "id"          =>  mailing.id,
               "listId"      =>  list.id,
+              "kind"        =>  mailing.kind,
               "name"        =>  "locked_mailing",
               "title"       =>  "Locked mailing",
               "subject"     =>  "Locked mailing",
-              "template"    =>  "User name: {{user.name}}.",
+              "template"    =>  {
+                                  "html"  =>  mailing.template_plain,
+                                  "plain" =>  mailing.template_plain
+                                },
               "conditions"  =>  nil,
               "from"        =>  nil,
               "state"       =>  "enabled",
@@ -216,7 +220,7 @@ describe "OneTimeMailings API" do
     it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
 
     context "with correct params" do
-      before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at}}.to_json }
+      before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {kind: "plain", title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", template_html: "Bye!", start_at: start_at}}.to_json }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -224,10 +228,11 @@ describe "OneTimeMailings API" do
       it { expect(MailyHerald::OneTimeMailing.count).to eq(2) }
       it { expect(response_json["oneTimeMailing"]["id"]).to eq(MailyHerald::OneTimeMailing.where(name: "new_onetimemailing").first.id) }
       it { expect(response_json["oneTimeMailing"]["listId"]).to eq(list.id) }
+      it { expect(response_json["oneTimeMailing"]["kind"]).to eq("plain") }
       it { expect(response_json["oneTimeMailing"]["name"]).to eq("new_onetimemailing") }
       it { expect(response_json["oneTimeMailing"]["title"]).to eq("New oneTimeMailing") }
       it { expect(response_json["oneTimeMailing"]["subject"]).to eq("New Subject") }
-      it { expect(response_json["oneTimeMailing"]["template"]).to eq("Hello!") }
+      it { expect(response_json["oneTimeMailing"]["template"]).to eq({"html" => "Hello!", "plain" => "Hello!"}) }
       it { expect(response_json["oneTimeMailing"]["state"]).to eq("disabled") }
       it { expect(response_json["oneTimeMailing"]["mailerName"]).to eq("generic") }
       it { expect(response_json["oneTimeMailing"]["conditions"]).to be_nil }
@@ -238,7 +243,7 @@ describe "OneTimeMailings API" do
 
     context "with incorrect params" do
       context "not setup mailer" do
-        before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {mailer_name: "wrongOne", title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {mailer_name: "wrongOne", title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -247,13 +252,23 @@ describe "OneTimeMailings API" do
         it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
       end
 
-      context "wrong template" do
-        before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template: "Hello {{ world!", start_at: start_at}}.to_json }
+      context "wrong kind" do
+        before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {kind: "wrong", title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
         it { expect(response_json).not_to be_empty }
-        it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+        it { expect(response_json["errors"]["kind"]).to eq("invalid") }
+        it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
+      end
+
+      context "wrong template" do
+        before { send_request :post, "/maily_herald/api/v1/one_time_mailings", {one_time_mailing: {title: "New oneTimeMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello {{ world!", start_at: start_at}}.to_json }
+
+        it { expect(response.status).to eq(422) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["errors"]["templatePlain"]).to eq("syntaxError") }
         it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
       end
 
@@ -304,7 +319,8 @@ describe "OneTimeMailings API" do
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
         it { expect(response_json).not_to be_empty }
-        it { expect(response_json["errors"]["template"]).to eq("blank") }
+        it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+        it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
         it { expect(MailyHerald::OneTimeMailing.count).to eq(1) }
       end
 
@@ -347,13 +363,13 @@ describe "OneTimeMailings API" do
     context "with correct OneTimeMailing ID" do
       context "with correct params" do
         context "not locked mailing" do
-          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {subject: "New Subject", template: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
           it { expect(response_json).not_to be_empty }
           it { expect(response_json["oneTimeMailing"]["subject"]).to eq("New Subject") }
-          it { expect(response_json["oneTimeMailing"]["template"]).to eq("New Template") }
+          it { expect(response_json["oneTimeMailing"]["template"]).to eq({"html" => "New Template", "plain" => "New Template"}) }
           it { expect(response_json["oneTimeMailing"]["state"]).to eq("enabled") }
           it { expect(response_json["oneTimeMailing"]["mailerName"]).to eq("generic") }
           it { expect(response_json["oneTimeMailing"]["conditions"]).to eq("active") }
@@ -375,22 +391,42 @@ describe "OneTimeMailings API" do
 
       context "with incorrect params" do
         context "blanks" do
-          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {title: "", list: ""}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {title: "", list: "", template_plain: "", template_html: ""}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
           it { expect(response_json).not_to be_empty }
           it { expect(response_json["errors"]["title"]).to eq("blank") }
-          it { expect(response_json["errors"]["list"]).to eq("blank") }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+          it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
         end
 
-        context "wrong template" do
-          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {template: "{{"}}.to_json }
+        context "wrong kind" do
+          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {kind: "wrong"}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
           it { expect(response_json).not_to be_empty }
-          it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+          it { expect(response_json["errors"]["kind"]).to eq("invalid") }
+        end
+
+        context "wrong template" do
+          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {template_plain: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("syntaxError") }
+        end
+
+        context "blank template when changed kind" do
+          before { send_request :put, "/maily_herald/api/v1/one_time_mailings/#{mailing.id}", {one_time_mailing: {kind: "html"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+          it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
         end
 
         context "wrong conditions" do

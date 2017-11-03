@@ -189,10 +189,14 @@ describe "PeriodicalMailings API" do
             {
               "id"            =>  mailing.id,
               "listId"        =>  list.id,
+              "kind"          =>  mailing.kind,
               "name"          =>  "weekly_summary",
               "title"         =>  "Test periodical mailing",
               "subject"       =>  "Weekly summary",
-              "template"      =>  "User name: {{user.name}}.",
+              "template"      =>  {
+                                    "html"  =>  mailing.template_plain,
+                                    "plain" =>  mailing.template_plain
+                                  },
               "conditions"    =>  "user.weekly_notifications == true",
               "from"          =>  nil,
               "state"         =>  "enabled",
@@ -213,7 +217,7 @@ describe "PeriodicalMailings API" do
     it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
 
     context "with correct params" do
-      before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at, period: 604800}}.to_json }
+      before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {kind: "plain", title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", template_html: "Bye!", start_at: start_at, period: 604800}}.to_json }
 
       it { expect(response.status).to eq(200) }
       it { expect(response).to be_success }
@@ -221,10 +225,11 @@ describe "PeriodicalMailings API" do
       it { expect(MailyHerald::PeriodicalMailing.count).to eq(1) }
       it { expect(response_json["periodicalMailing"]["id"]).to eq(MailyHerald::PeriodicalMailing.where(name: "new_periodicalmailing").first.id) }
       it { expect(response_json["periodicalMailing"]["listId"]).to eq(list.id) }
+      it { expect(response_json["periodicalMailing"]["kind"]).to eq("plain") }
       it { expect(response_json["periodicalMailing"]["name"]).to eq("new_periodicalmailing") }
       it { expect(response_json["periodicalMailing"]["title"]).to eq("New periodicalMailing") }
       it { expect(response_json["periodicalMailing"]["subject"]).to eq("New Subject") }
-      it { expect(response_json["periodicalMailing"]["template"]).to eq("Hello!") }
+      it { expect(response_json["periodicalMailing"]["template"]).to eq({"html" => "Hello!", "plain" => "Hello!"}) }
       it { expect(response_json["periodicalMailing"]["state"]).to eq("disabled") }
       it { expect(response_json["periodicalMailing"]["mailerName"]).to eq("generic") }
       it { expect(response_json["periodicalMailing"]["conditions"]).to be_nil }
@@ -236,7 +241,7 @@ describe "PeriodicalMailings API" do
 
     context "with incorrect params" do
       context "not setup mailer" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {mailer_name: "wrongOne", title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at, period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {mailer_name: "wrongOne", title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at, period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -245,18 +250,28 @@ describe "PeriodicalMailings API" do
         it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
       end
 
-      context "wrong template" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello {{ world!", start_at: start_at, period: 604800}}.to_json }
+      context "wrong kind" do
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {kind: "wrong", title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at, period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
         it { expect(response_json).not_to be_empty }
-        it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+        it { expect(response_json["errors"]["kind"]).to eq("invalid") }
+        it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
+      end
+
+      context "wrong template" do
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello {{ world!", start_at: start_at, period: 604800}}.to_json }
+
+        it { expect(response.status).to eq(422) }
+        it { expect(response).not_to be_success }
+        it { expect(response_json).not_to be_empty }
+        it { expect(response_json["errors"]["templatePlain"]).to eq("syntaxError") }
         it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
       end
 
       context "wrong conditions" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", conditions: "{{", start_at: start_at, period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", conditions: "{{", start_at: start_at, period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -266,7 +281,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "nil title" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at, period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at, period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -277,7 +292,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "nil list" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", subject: "New Subject", template: "Hello!", start_at: start_at, period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", subject: "New Subject", template_plain: "Hello!", start_at: start_at, period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -287,7 +302,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "nil subject when generic mailer" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", template: "Hello!", start_at: start_at, period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", template_plain: "Hello!", start_at: start_at, period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -302,12 +317,13 @@ describe "PeriodicalMailings API" do
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
         it { expect(response_json).not_to be_empty }
-        it { expect(response_json["errors"]["template"]).to eq("blank") }
+        it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+        it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
         it { expect(MailyHerald::PeriodicalMailing.count).to eq(0) }
       end
 
       context "nil start_at" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -317,7 +333,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "wrong start_at" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: "{{", period: 604800}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: "{{", period: 604800}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -327,7 +343,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "nil period" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -337,7 +353,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "wrong period - string" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: start_at, period: "wrongOne"}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: start_at, period: "wrongOne"}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -347,7 +363,7 @@ describe "PeriodicalMailings API" do
       end
 
       context "wrong period - 0" do
-        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template: "Hello!", start_at: "{{", period: 0}}.to_json }
+        before { send_request :post, "/maily_herald/api/v1/periodical_mailings", {periodical_mailing: {title: "New periodicalMailing", list: "generic_list", subject: "New Subject", template_plain: "Hello!", start_at: "{{", period: 0}}.to_json }
 
         it { expect(response.status).to eq(422) }
         it { expect(response).not_to be_success }
@@ -364,7 +380,7 @@ describe "PeriodicalMailings API" do
     it { expect(MailyHerald::PeriodicalMailing.count).to eq(1) }
 
     context "with incorrect PeriodicalMailing ID" do
-      before { send_request :put, "/maily_herald/api/v1/periodical_mailings/0", {periodical_mailing: {subject: "New Subject", template: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", period: 864000}}.to_json }
+      before { send_request :put, "/maily_herald/api/v1/periodical_mailings/0", {periodical_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", period: 864000}}.to_json }
 
       it { expect(response.status).to eq(404) }
       it { expect(response).not_to be_success }
@@ -375,13 +391,13 @@ describe "PeriodicalMailings API" do
     context "with correct PeriodicalMailing ID" do
       context "with correct params" do
         context "not locked mailing" do
-          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {subject: "New Subject", template: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", period: 864000}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", period: 864000}}.to_json }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
           it { expect(response_json).not_to be_empty }
           it { expect(response_json["periodicalMailing"]["subject"]).to eq("New Subject") }
-          it { expect(response_json["periodicalMailing"]["template"]).to eq("New Template") }
+          it { expect(response_json["periodicalMailing"]["template"]).to eq({"html" => "New Template", "plain" => "New Template"}) }
           it { expect(response_json["periodicalMailing"]["state"]).to eq("enabled") }
           it { expect(response_json["periodicalMailing"]["mailerName"]).to eq("generic") }
           it { expect(response_json["periodicalMailing"]["conditions"]).to eq("active") }
@@ -392,22 +408,43 @@ describe "PeriodicalMailings API" do
 
       context "with incorrect params" do
         context "blanks" do
-          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {title: "", list: ""}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {title: "", list: "", template_plain: "", template_html: ""}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
           it { expect(response_json).not_to be_empty }
           it { expect(response_json["errors"]["title"]).to eq("blank") }
           it { expect(response_json["errors"]["list"]).to eq("blank") }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+          it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
         end
 
-        context "wrong template" do
-          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {template: "{{"}}.to_json }
+        context "blank template when changed kind" do
+          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {kind: "html"}}.to_json }
 
           it { expect(response.status).to eq(422) }
           it { expect(response).not_to be_success }
           it { expect(response_json).not_to be_empty }
-          it { expect(response_json["errors"]["template"]).to eq("syntaxError") }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("blank") }
+          it { expect(response_json["errors"]["templateHtml"]).to eq("blank") }
+        end
+
+        context "wrong kind" do
+          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {kind: "wrong"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["kind"]).to eq("invalid") }
+        end
+
+        context "wrong template" do
+          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {template_plain: "{{"}}.to_json }
+
+          it { expect(response.status).to eq(422) }
+          it { expect(response).not_to be_success }
+          it { expect(response_json).not_to be_empty }
+          it { expect(response_json["errors"]["templatePlain"]).to eq("syntaxError") }
         end
 
         context "wrong conditions" do

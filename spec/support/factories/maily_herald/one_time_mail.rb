@@ -7,7 +7,6 @@ FactoryGirl.define do
     title                   "One time mailing"
     list                    :generic_list
     state                   "enabled"
-    override_subscription   false
   end
 
   factory :generic_one_time_mailing, class: "MailyHerald::OneTimeMailing" do
@@ -18,10 +17,9 @@ FactoryGirl.define do
     name                    "test_mailing"
     title                   "Test mailing"
     subject                 "Test mailing"
-    template                "User name: {{user.name}}."
+    template_plain          "User name: {{user.name}}."
     list                    :generic_list
     state                   "enabled"
-    override_subscription   false
     from                    "foo@bar.com"
   end
 end

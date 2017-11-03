@@ -1,6 +1,6 @@
 module MailyHerald
   class MailingSerializer < ActiveModel::Serializer
-    attributes :id, :listId, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked
+    attributes :id, :listId, :kind, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked
 
     def listId
       object.list_id
@@ -12,6 +12,10 @@ module MailyHerald
 
     def locked
       object.locked?
+    end
+
+    def template
+      MailyHerald::Mailing::TemplateSerializer.new(object.template).as_json
     end
   end
 end

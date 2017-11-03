@@ -13,13 +13,17 @@ describe MailyHerald::MailingSerializer do
       expect(described_class.new(ad_hoc_mailing).as_json).to eq({
         id:         ad_hoc_mailing.id,
         listId:     ad_hoc_mailing.list.id,
+        kind:        ad_hoc_mailing.kind,
         conditions: ad_hoc_mailing.conditions,
         from:       ad_hoc_mailing.from,
         mailerName: ad_hoc_mailing.mailer_name,
         name:       ad_hoc_mailing.name,
         state:      ad_hoc_mailing.state,
         subject:    ad_hoc_mailing.subject,
-        template:   ad_hoc_mailing.template,
+        template:   {
+                      html:  ad_hoc_mailing.template_plain,
+                      plain: ad_hoc_mailing.template_plain
+                    },
         title:      ad_hoc_mailing.title,
         locked:     false
       })
