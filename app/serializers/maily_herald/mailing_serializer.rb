@@ -15,7 +15,7 @@ module MailyHerald
     end
 
     def template
-      MailyHerald::Mailing::TemplateSerializer.new(object.template).as_json
+      MailyHerald::Mailing::TemplateSerializer.new(object.template_wrapper).as_json
     end
   end
 end
