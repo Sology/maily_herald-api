@@ -6,7 +6,7 @@ module MailyHerald
         private
 
         def item_params
-          params.require(:one_time_mailing).permit(:kind, :title, :mailer_name, :list, :from, :conditions, :subject, :template_plain, :template_html, :start_at)
+          params.require(:one_time_mailing).permit(:kind, :title, :mailer_name, :list, :from, :conditions, :subject, :template_plain, :template_html, :start_at, :track)
         end
       end
     end

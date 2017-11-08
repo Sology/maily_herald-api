@@ -198,7 +198,8 @@ describe "AdHocMailings API" do
               "from"        =>  nil,
               "state"       =>  "enabled",
               "mailerName"  =>  "AdHocMailer",
-              "locked"      =>  false
+              "locked"      =>  false,
+              "track"       =>  true
            }
          )
         }
@@ -220,6 +221,7 @@ describe "AdHocMailings API" do
       it { expect(response_json["adHocMailing"]["kind"]).to eq("plain") }
       it { expect(response_json["adHocMailing"]["name"]).to eq("new_adhocmailing") }
       it { expect(response_json["adHocMailing"]["title"]).to eq("New adHocMailing") }
+      it { expect(response_json["adHocMailing"]["track"]).to be_truthy }
       it { expect(response_json["adHocMailing"]["subject"]).to eq("New Subject") }
       it { expect(response_json["adHocMailing"]["template"]).to eq({"html" => "Hello!", "plain" => "Hello!"}) }
       it { expect(response_json["adHocMailing"]["state"]).to eq("disabled") }
@@ -330,7 +332,7 @@ describe "AdHocMailings API" do
 
     context "with correct AdHocMailing ID" do
       context "with correct params" do
-        before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled"}}.to_json }
+        before { send_request :put, "/maily_herald/api/v1/ad_hoc_mailings/#{mailing.id}", {ad_hoc_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", track: false}}.to_json }
 
         it { expect(response.status).to eq(200) }
         it { expect(response).to be_success }
@@ -340,6 +342,7 @@ describe "AdHocMailings API" do
         it { expect(response_json["adHocMailing"]["state"]).to eq("enabled") }
         it { expect(response_json["adHocMailing"]["mailerName"]).to eq("generic") }
         it { expect(response_json["adHocMailing"]["conditions"]).to eq("active") }
+        it { expect(response_json["adHocMailing"]["track"]).to be_falsy }
         it { mailing.reload; expect(mailing.subject).to eq("New Subject") }
       end
 

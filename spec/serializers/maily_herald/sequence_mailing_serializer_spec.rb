@@ -27,6 +27,7 @@ describe MailyHerald::SequenceMailingSerializer do
                                 plain: sequence_mailing.template_plain
                               },
         title:                sequence_mailing.title,
+        track:                true,
         locked:               false,
         absoluteDelay:        sequence_mailing.absolute_delay
       })

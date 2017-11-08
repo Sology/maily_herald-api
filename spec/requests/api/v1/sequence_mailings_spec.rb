@@ -224,7 +224,8 @@ describe "SequenceMailings API" do
                 "state"                =>  mailing.state.to_s,
                 "mailerName"           =>  mailing.mailer_name.to_s,
                 "locked"               =>  mailing.locked?,
-                "absoluteDelay"        =>  mailing.absolute_delay
+                "absoluteDelay"        =>  mailing.absolute_delay,
+                "track"                =>  true
              }
            )
           }
@@ -262,6 +263,7 @@ describe "SequenceMailings API" do
         it { expect(response_json["sequenceMailing"]["kind"]).to eq("plain") }
         it { expect(response_json["sequenceMailing"]["name"]).to eq("new_sequencemailing") }
         it { expect(response_json["sequenceMailing"]["title"]).to eq("New sequenceMailing") }
+        it { expect(response_json["sequenceMailing"]["track"]).to be_truthy }
         it { expect(response_json["sequenceMailing"]["subject"]).to eq("New Subject") }
         it { expect(response_json["sequenceMailing"]["template"]).to eq({"html" => "Hello!", "plain" => "Hello!"}) }
         it { expect(response_json["sequenceMailing"]["state"]).to eq("disabled") }
@@ -386,7 +388,7 @@ describe "SequenceMailings API" do
 
       context "with correct SequenceMailing ID" do
         context "with correct params" do
-          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {kind: "plain", subject: "New Subject", template_plain: "New Template", template_html: "should not be saved", conditions: "active", state: "enabled", absolute_delay: 7200}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/sequences/#{sequence.id}/mailings/#{mailing.id}", {sequence_mailing: {kind: "plain", subject: "New Subject", template_plain: "New Template", template_html: "should not be saved", conditions: "active", state: "enabled", absolute_delay: 7200, track: false}}.to_json }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -395,6 +397,7 @@ describe "SequenceMailings API" do
           it { expect(response_json["sequenceMailing"]["template"]).to eq({"html" => "New Template", "plain" => "New Template"}) }
           it { expect(response_json["sequenceMailing"]["state"]).to eq("enabled") }
           it { expect(response_json["sequenceMailing"]["conditions"]).to eq("active") }
+          it { expect(response_json["sequenceMailing"]["track"]).to be_falsy }
           it { expect(response_json["sequenceMailing"]["absoluteDelay"]).to eq(7200) }
           it { mailing.reload; expect(mailing.subject).to eq("New Subject") }
         end

@@ -25,6 +25,7 @@ describe MailyHerald::PeriodicalMailingSerializer do
                          plain: periodical_mailing.template_plain
                        },
         title:         periodical_mailing.title,
+        track:         true,
         startAt:       periodical_mailing.start_at.as_json,
         period:        periodical_mailing.period, 
         locked:        false

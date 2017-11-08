@@ -25,6 +25,7 @@ describe MailyHerald::MailingSerializer do
                       plain: ad_hoc_mailing.template_plain
                     },
         title:      ad_hoc_mailing.title,
+        track:      true,
         locked:     false
       })
     end

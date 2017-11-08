@@ -247,6 +247,7 @@ describe "Sequences API" do
                                             "state"                =>  mailing1.state.to_s,
                                             "mailerName"           =>  mailing1.mailer_name.to_s,
                                             "locked"               =>  false,
+                                            "track"                =>  true,
                                             "absoluteDelay"        =>  mailing1.absolute_delay
                                           },
                                           {
@@ -265,6 +266,7 @@ describe "Sequences API" do
                                             "state"                =>  mailing2.state.to_s,
                                             "mailerName"           =>  mailing2.mailer_name.to_s,
                                             "locked"               =>  false,
+                                            "track"                =>  true,
                                             "absoluteDelay"        =>  mailing2.absolute_delay
                                           },
                                           {
@@ -283,6 +285,7 @@ describe "Sequences API" do
                                             "state"                =>  mailing3.state.to_s,
                                             "mailerName"           =>  mailing3.mailer_name.to_s,
                                             "locked"               =>  false,
+                                            "track"                =>  true,
                                             "absoluteDelay"        =>  mailing3.absolute_delay
                                           }
                                         ]

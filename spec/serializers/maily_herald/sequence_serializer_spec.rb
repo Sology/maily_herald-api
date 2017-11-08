@@ -69,6 +69,7 @@ describe MailyHerald::SequenceSerializer do
                                   state:                mailing1.state,
                                   mailerName:           mailing1.mailer_name,
                                   locked:               false,
+                                  track:                true,
                                   absoluteDelay:        mailing1.absolute_delay
                                 },
                                 {
@@ -87,6 +88,7 @@ describe MailyHerald::SequenceSerializer do
                                   state:                mailing2.state,
                                   mailerName:           mailing2.mailer_name,
                                   locked:               false,
+                                  track:                true,
                                   absoluteDelay:        mailing2.absolute_delay
                                 },
                                 {
@@ -105,6 +107,7 @@ describe MailyHerald::SequenceSerializer do
                                   state:                mailing3.state,
                                   mailerName:           mailing3.mailer_name,
                                   locked:               false,
+                                  track:                true,
                                   absoluteDelay:        mailing3.absolute_delay
                                 }
                               ]

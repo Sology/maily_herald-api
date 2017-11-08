@@ -1,6 +1,6 @@
 module MailyHerald
   class MailingSerializer < ActiveModel::Serializer
-    attributes :id, :listId, :kind, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked
+    attributes :id, :listId, :kind, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked, :track
 
     def listId
       object.list_id

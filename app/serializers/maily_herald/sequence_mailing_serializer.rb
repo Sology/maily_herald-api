@@ -1,6 +1,6 @@
 module MailyHerald
   class SequenceMailingSerializer < ActiveModel::Serializer
-    attributes :id, :sequenceId, :kind, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked, :absoluteDelay
+    attributes :id, :sequenceId, :kind, :name, :title, :subject, :template, :conditions, :from, :state, :mailerName, :locked, :absoluteDelay, :track
 
     def sequenceId
       object.sequence_id

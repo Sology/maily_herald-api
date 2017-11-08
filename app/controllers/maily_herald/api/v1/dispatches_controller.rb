@@ -35,7 +35,7 @@ module MailyHerald
         end
 
         def item_params
-          params.require(mark_required).permit(:kind, :title, :mailer_name, :list, :from, :conditions, :subject, :template_plain, :template_html)
+          params.require(mark_required).permit(:kind, :title, :mailer_name, :list, :from, :conditions, :subject, :template_plain, :template_html, :track)
         end
 
         def root

@@ -535,6 +535,9 @@ paths:
                   mailer_name:
                     type: string
                     description: Has to be previously created mailer.
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -694,6 +697,9 @@ paths:
                         - enabled
                         - disabled
                         - archived
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -966,6 +972,9 @@ paths:
                     type: string
                     description: >-
                       Date with time as a string. Can be described with Liquid syntax e.g. "user.created_at | plus: 5, 'minutes'", but it have to return time value.
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -1135,6 +1144,9 @@ paths:
                         - enabled
                         - disabled
                         - archived
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -1374,6 +1386,9 @@ paths:
                     required: true
                     type: integer
                     description: Amount of time between consecutive mailing deliveries (in seconds).
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -1554,6 +1569,9 @@ paths:
                         - enabled
                         - disabled
                         - archived
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -2041,6 +2059,9 @@ paths:
                     required: true
                     type: integer
                     description: Specified amount of time after starting the sequence when mailing is delivered (in seconds).
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -2215,6 +2236,9 @@ paths:
                         - enabled
                         - disabled
                         - archived
+                  track:
+                    type: boolean
+                    description: Indicates whether emails from this mailing are tracked or not.
       responses:
         '200':
           description: Success
@@ -2585,6 +2609,9 @@ definitions:
       locked:
         type: boolean
         description: Indicates whether mailing is locked or not.
+      track:
+        type: boolean
+        description: Indicates whether emails from this mailing are tracked or not.
     required:
       - name
       - title
@@ -2647,6 +2674,9 @@ definitions:
       startAt:
         type: string
         description: OneTimeMailing's delivery start time. E.g. 2017-10-24T11:11:55.526+02:00
+      track:
+        type: boolean
+        description: Indicates whether emails from this mailing are tracked or not.
     required:
       - name
       - title
@@ -2713,6 +2743,9 @@ definitions:
       period:
         type: integer
         description: PeriodicalMailing's delivery period in seconds.
+      track:
+        type: boolean
+        description: Indicates whether emails from this mailing are tracked or not.
     required:
       - name
       - title
@@ -2812,6 +2845,9 @@ definitions:
       absoluteDelay:
         type: string
         description: Specified amount of time after starting the sequence when mailing is delivered in seconds.
+      track:
+        type: boolean
+        description: Indicates whether emails from this mailing are tracked or not.
     required:
       - sequenceId
       - name
@@ -2848,7 +2884,7 @@ definitions:
             - error
       data:
         type: object
-        description: Various data.
+        description: Various data. Contains also tracking data if email was delivered.
       processingAt:
         type: string
         description: Delivery processing date-time.

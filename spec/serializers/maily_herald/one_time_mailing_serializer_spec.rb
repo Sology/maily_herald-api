@@ -25,6 +25,7 @@ describe MailyHerald::OneTimeMailingSerializer do
                       plain: one_time_mailing.template_plain
                     },
         title:      one_time_mailing.title,
+        track:      true,
         startAt:    one_time_mailing.start_at.as_json,
         locked:     false
       })

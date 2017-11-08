@@ -203,7 +203,8 @@ describe "PeriodicalMailings API" do
               "mailerName"    =>  "generic",
               "startAt"       =>  "user.created_at",
               "locked"        =>  false,
-              "period"        =>  mailing.period
+              "period"        =>  mailing.period,
+              "track"         =>  true
            }
          )
         }
@@ -228,6 +229,7 @@ describe "PeriodicalMailings API" do
       it { expect(response_json["periodicalMailing"]["kind"]).to eq("plain") }
       it { expect(response_json["periodicalMailing"]["name"]).to eq("new_periodicalmailing") }
       it { expect(response_json["periodicalMailing"]["title"]).to eq("New periodicalMailing") }
+      it { expect(response_json["periodicalMailing"]["track"]).to be_truthy }
       it { expect(response_json["periodicalMailing"]["subject"]).to eq("New Subject") }
       it { expect(response_json["periodicalMailing"]["template"]).to eq({"html" => "Hello!", "plain" => "Hello!"}) }
       it { expect(response_json["periodicalMailing"]["state"]).to eq("disabled") }
@@ -391,7 +393,7 @@ describe "PeriodicalMailings API" do
     context "with correct PeriodicalMailing ID" do
       context "with correct params" do
         context "not locked mailing" do
-          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", period: 864000}}.to_json }
+          before { send_request :put, "/maily_herald/api/v1/periodical_mailings/#{mailing.id}", {periodical_mailing: {subject: "New Subject", template_plain: "New Template", mailer_name: "generic", conditions: "active", state: "enabled", period: 864000, track: false}}.to_json }
 
           it { expect(response.status).to eq(200) }
           it { expect(response).to be_success }
@@ -401,6 +403,7 @@ describe "PeriodicalMailings API" do
           it { expect(response_json["periodicalMailing"]["state"]).to eq("enabled") }
           it { expect(response_json["periodicalMailing"]["mailerName"]).to eq("generic") }
           it { expect(response_json["periodicalMailing"]["conditions"]).to eq("active") }
+          it { expect(response_json["periodicalMailing"]["track"]).to be_falsy }
           it { expect(response_json["periodicalMailing"]["period"]).to eq(864000) }
           it { mailing.reload; expect(mailing.subject).to eq("New Subject") }
         end
