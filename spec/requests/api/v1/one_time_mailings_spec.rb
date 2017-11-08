@@ -538,14 +538,26 @@ describe "OneTimeMailings API" do
                                 {"name"=>"From"          , "value"=>mailing.from},
                                 {"name"=>"To"            , "value"=>entity.email},
                                 {"name"=>"Subject"       , "value"=>mailing.subject},
-                                {"name"=>"Mime-Version"  , "value"=>"1.0"},
-                                {"name"=>"Content-Type"  , "value"=>"text/plain"}
+                                {"name"=>"Mime-Version"  , "value"=>"1.0"}
                               ],
-             "body"       =>  {
-                                "charset"   =>  "US-ASCII",
-                                "encoding"  =>  "7bit",
-                                "rawSource" =>  "User name: #{entity.name}."
-                              }
+             "parts"      =>  [
+                                {
+                                  "headers" => [{"name"=>"Content-Type", "value"=>"text/plain"}],
+                                  "body"    => {
+                                                 "charset"   =>  "US-ASCII",
+                                                 "encoding"  =>  "7bit",
+                                                 "rawSource" =>  "User name: #{entity.name}."
+                                               }
+                                },
+                                {
+                                  "headers" => [{"name"=>"Content-Type", "value"=>"text/html"}],
+                                  "body"    => {
+                                                 "charset"   =>  "US-ASCII",
+                                                 "encoding"  =>  "7bit",
+                                                 "rawSource" =>  "User name: #{entity.name}."
+                                               }
+                                }
+                              ]
            })
          }
     end

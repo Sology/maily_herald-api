@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171102123908) do
+ActiveRecord::Schema.define(version: 20171108113259) do
 
   create_table "maily_herald_dispatches", force: :cascade do |t|
     t.string "type", null: false
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20171102123908) do
     t.datetime "updated_at", null: false
     t.integer "kind", default: 0, null: false
     t.text "template_html"
+    t.boolean "track", default: true
     t.index ["name"], name: "index_maily_herald_dispatches_on_name", unique: true
   end
 
@@ -48,6 +49,7 @@ ActiveRecord::Schema.define(version: 20171102123908) do
     t.string "status", null: false
     t.text "data"
     t.datetime "processing_at"
+    t.string "token"
   end
 
   create_table "maily_herald_subscriptions", force: :cascade do |t|

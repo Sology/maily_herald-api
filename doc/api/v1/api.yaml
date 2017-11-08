@@ -2867,19 +2867,14 @@ definitions:
         description: Array of email headers.
         items:
           $ref: '#/definitions/MailHeader'
+      parts:
+        type: array
+        description: Array of email parts. Present only if email multiple parts.
+        items:
+          $ref: '#/definitions/MailPart'
       body:
-        type: object
-        description: Serialized Mail::Body object.
-        properties:
-          charset:
-            type: string
-            description: Charset e.g. US-ASCII
-          encoding:
-            type: string
-            description: Encoding e.g. 7bit
-          rawSource:
-            type: string
-            description: Email body.
+        $ref: '#/definitions/MailBody'
+        description: Present only if email has only one part (for example only text/plain version).
   MailHeader:
     type: object
     description: Serialized Mail::Header object.
@@ -2890,6 +2885,30 @@ definitions:
       value:
         type: string
         description: Value of email header.
+  MailBody:
+    type: object
+    description: Serialized Mail::Body object.
+    properties:
+      charset:
+        type: string
+        description: Charset e.g. US-ASCII
+      encoding:
+        type: string
+        description: Encoding e.g. 7bit
+      rawSource:
+        type: string
+        description: Email body.
+  MailPart:
+    type: object
+    description: Serialized Mail::Part object.
+    properties:
+      headers:
+        type: array
+        description: Array of email headers.
+        items:
+          $ref: '#/definitions/MailHeader'
+      body:
+        $ref: '#/definitions/MailBody'
   Meta:
     type: object
     description: Meta object.
