@@ -521,7 +521,7 @@ paths:
                   template_html:
                     required: true
                     type: string
-                    description: Ad hoc mailing's HTML template.
+                    description: Ad hoc mailing's HTML template. Will be validated against Liquid syntax.
                   list:
                     required: true
                     type: string
@@ -677,7 +677,7 @@ paths:
                     description: Ad hoc mailing's new plain text template. Will be validated against Liquid syntax.
                   template_html:
                     type: string
-                    description: Ad hoc mailing's new HTML template.
+                    description: Ad hoc mailing's new HTML template. Will be validated against Liquid syntax.
                   list:
                     type: string
                     description: Previously created MailyHerald::List object's name.
@@ -952,7 +952,7 @@ paths:
                   template_html:
                     required: true
                     type: string
-                    description: One time mailing's HTML template.
+                    description: One time mailing's HTML template. Will be validated against Liquid syntax.
                   list:
                     required: true
                     type: string
@@ -1121,7 +1121,7 @@ paths:
                     description: One time mailing's new plain text template. Will be validated against Liquid syntax.
                   template_html:
                     type: string
-                    description: One time mailing's new HTML template.
+                    description: One time mailing's new HTML template. Will be validated against Liquid syntax.
                   list:
                     type: string
                     description: Previously created MailyHerald::List object's name.
@@ -1362,7 +1362,7 @@ paths:
                   template_html:
                     required: true
                     type: string
-                    description: Periodical mailing's HTML template.
+                    description: Periodical mailing's HTML template. Will be validated against Liquid syntax.
                   list:
                     required: true
                     type: string
@@ -1543,7 +1543,7 @@ paths:
                     description: Periodical mailing's new plain text template. Will be validated against Liquid syntax.
                   template_html:
                     type: string
-                    description: Periodical mailing's new HTML template.
+                    description: Periodical mailing's new HTML template. Will be validated against Liquid syntax.
                   list:
                     type: string
                     description: Previously created MailyHerald::List object's name.
@@ -2044,7 +2044,7 @@ paths:
                   template_html:
                     required: true
                     type: string
-                    description: Sequence mailing's HTML template.
+                    description: Sequence mailing's HTML template. Will be validated against Liquid syntax.
                   from:
                     type: string
                     description: If not specified, default value will be used.
@@ -2216,7 +2216,7 @@ paths:
                     description: Sequence mailing's new plain text template. Will be validated against Liquid syntax.
                   template_html:
                     type: string
-                    description: Sequence mailing's new HTML template.
+                    description: Sequence mailing's new HTML template. Will be validated against Liquid syntax.
                   from:
                     type: string
                     description: If not specified, default value will be used.
