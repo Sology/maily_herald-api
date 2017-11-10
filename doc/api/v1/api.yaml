@@ -499,7 +499,7 @@ paths:
                     type: string
                     description: >-
                       Ad hoc mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -663,7 +663,7 @@ paths:
                     type: string
                     description: >-
                       Ad hoc mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -930,7 +930,7 @@ paths:
                     type: string
                     description: >-
                       One time mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -1107,7 +1107,7 @@ paths:
                     type: string
                     description: >-
                       One time mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -1340,7 +1340,7 @@ paths:
                     type: string
                     description: >-
                       Ad hoc mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -1529,7 +1529,7 @@ paths:
                     type: string
                     description: >-
                       Periodical mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -2022,7 +2022,7 @@ paths:
                     type: string
                     description: >-
                       Sequence mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -2202,7 +2202,7 @@ paths:
                     type: string
                     description: >-
                       Sequence mailing's new kind. One of following allowed:
-                        - both
+                        - mixed
                         - html
                         - plain
                   title:
@@ -2566,8 +2566,8 @@ definitions:
       kind:
         type: string
         description: >-
-          AdHocMailing's email type. Can be only: (if not given, it defaults to 'both')
-            - both
+          AdHocMailing's email type. Can be only: (if not given, it defaults to 'mixed')
+            - mixed
             - html
             - plain
       name:
@@ -2628,8 +2628,8 @@ definitions:
       kind:
         type: string
         description: >-
-          OneTimeMailing's email type. Can be only: (if not given, it defaults to 'both')
-            - both
+          OneTimeMailing's email type. Can be only: (if not given, it defaults to 'mixed')
+            - mixed
             - html
             - plain
       name:
@@ -2694,8 +2694,8 @@ definitions:
       kind:
         type: string
         description: >-
-          PeriodicalMailing's email type. Can be only: (if not given, it defaults to 'both')
-            - both
+          PeriodicalMailing's email type. Can be only: (if not given, it defaults to 'mixed')
+            - mixed
             - html
             - plain
       name:
@@ -2802,8 +2802,8 @@ definitions:
       kind:
         type: string
         description: >-
-          SequenceMailing's email type. Can be only: (if not given, it defaults to 'both')
-            - both
+          SequenceMailing's email type. Can be only: (if not given, it defaults to 'mixed')
+            - mixed
             - html
             - plain
       name:
